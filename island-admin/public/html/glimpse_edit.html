@@ -1,0 +1,188 @@
+<div id="glimpse_edit">
+    <!--<script>-->
+        <!--window.UEDITOR_HOME_URL = "/static/ueditor/";-->
+    <!--</script>-->
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li><a href="javascript:;"  class="glimpse_edit_index">掠影列表</a></li>
+            <li class="layui-this">修改掠影详情</li>
+        </ul>
+    </div>
+    <form class="layui-form" id="form_activity_add" lay-filter="glimpse_edit">
+        <div class="layui-form-item">
+            <label class="layui-form-label">活动主题</label>
+            <div class="layui-input-block">
+                <input type="text" name="title" id="title" required  lay-verify="required" placeholder="请输入活动主题" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">二级主题</label>
+            <div class="layui-input-block">
+                <input type="text" name="s_title" id="s_title" required  lay-verify="required" placeholder="请输入副标题" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">发布时间</label>
+                <div class="layui-input-inline">
+                    <input required  lay-verify="required"  type="text" id="glimpse_time" name="glimpse_time"  placeholder="请选择发布时间" autocomplete="off" class="layui-input a_time" value="">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <button type="button" class="layui-btn" id="glimpse">上传图片</button>
+            </label>
+            <div class="layui-input-inline">
+                <p>预览图</p>
+                <img class="layui-upload-img" id="demo2" style="width:150px;height: 150px;">
+                <p id="demoText"></p>
+            </div>
+        </div>
+        <div class="glimpseAppend">
+
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">掠影内容</label>
+            <div class="layui-input-block">
+                <div id="g_editor_edit">
+
+                </div>
+                <script type="text/javascript" src="../static/wangEditor/release/wangEditor.min.js"></script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="glimpse_edit_commit">立即提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $('.glimpse_edit_index').click(function () {
+        $.get("glimpse_index.html",function (res) {
+            $('#glimpse_edit').html(res);
+        })
+    })
+</script>
+<script>
+    var E = window.wangEditor;
+    var g_editor_edit = new E('#g_editor_edit');
+    //editor_add.customConfig.debug = true;
+    g_editor_edit.customConfig.uploadFileName = 'file';
+    g_editor_edit.customConfig.uploadImgMaxSize = 4 * 1024 * 1024;
+    g_editor_edit.customConfig.uploadImgServer = '../index.php/admin/glimpse/editor_upload';
+    g_editor_edit.customConfig.uploadImgMaxLength = 1;
+    g_editor_edit.create();
+    g_editor_edit.customConfig.onchange = function (html) {
+        // 监控变化，同步更新到 textarea
+        $('#g_editor_edit').val(html)
+    };
+    var id = $('.glim_id').val();
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+        //赋值
+        $.get(`${__FORPUBLIC__}/admin/glimpse/edit`,{id:id},function (res) {
+            var form =layui.form;
+            form.val('glimpse_edit', {
+                "title": res.data.title
+                ,"s_title": res.data.s_title
+                ,"glimpse_time": res.data.glimpse_time
+                ,"publish_time": res.data.publish_time
+            });
+            $('#demo2').attr('src', "../"+res.data.glimpse_img);
+            g_editor_edit.txt.html(res.data.content);
+        });
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#glimpse'
+            ,url: `${__FORPUBLIC__}/admin/glimpse/img_edit?id=`+id
+            ,size: 1024*4 //限定大小
+            ,accept: 'images' //只允许上传图片
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#demo2').attr('src', result); //图片链接（base64）
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                layer.msg(res.msg);
+                // if(res.code > 0){
+                //     return layer.msg(res.msg);
+                // }
+                // //上传成功
+                // layer.msg('更新图片成功');
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+    });
+    layui.use(['layer', 'form'], function(){
+        var $ = layui.jquery
+            ,layer = layui.layer
+            ,from = layui.form;
+        from.render();
+        $('#glimpse_edit_commit').click(function () {
+            var title = $.trim($('#title').val());
+            var s_title = $.trim($('#s_title').val());
+            var glimpse_time = $('#glimpse_time').val();
+            var content =  g_editor_edit.txt.html();
+            if(title=="" || title.length>50){
+                layer.msg("主题不能为空或大于50个字");
+                return;
+            }
+            if(s_title.length>50){
+                layer.msg("二级主题不能为空或大于50个字");
+                return;
+            }
+            if(glimpse_time==""){
+                layer.msg("请填写时间");
+                return;
+            }
+            var jsonData = {
+                'id' : id,
+                'title' : title,
+                's_title' : s_title,
+                'glimpse_time' : glimpse_time,
+                'content' : content,
+            };
+            var jsonObj = JSON.stringify(jsonData);
+            $.ajax({
+                url:`${__FORPUBLIC__}/admin/glimpse/edit`,
+                type:'post',
+                contentType:"application/json;charset=utf-8,application/json",
+                data:jsonObj,
+                success:function (res) {
+                    layer.msg(res.msg);
+                    if(res.code==1){
+                        $.get("glimpse_index.html",function (data) {
+                            $('#glimpse_edit').html(data);
+                        })
+                    }
+                }
+            });
+            //get();
+        });
+    });
+</script>
+<script>
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        //常规用法
+        laydate.render({
+            elem: '#glimpse_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd HH:mm:ss'
+        });
+    });
+</script>

@@ -1,0 +1,162 @@
+<div id="activity_edit">
+    <!--<script>-->
+        <!--window.UEDITOR_HOME_URL = "/static/ueditor/";-->
+    <!--</script>-->
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li><a href="javascript:;"  class="activity_edit_index">社区通告列表</a></li>
+            <li class="layui-this">修改社区通告详情</li>
+        </ul>
+    </div>
+    <form class="layui-form" id="form_activity_edit" lay-filter="activity_edit">
+        <div class="layui-form-item">
+            <label class="layui-form-label">社区通告主题</label>
+            <div class="layui-input-block">
+                <input type="text" name="a_title" id="a_title" value="" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="a_title layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">发布时间</label>
+            <div class="layui-input-inline">
+                <input required  lay-verify="required"  type="text" id="newstime" name="a_time"  placeholder="请选择发布时间" autocomplete="off" class="layui-input a_time" value="">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否置顶</label>
+            <div class="layui-input-block">
+                <input type="radio" name="is_hot" value="1" title="是" checked>
+                <input type="radio" name="is_hot" value="0" title="否">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否隐藏</label>
+            <div class="layui-input-block">
+                <input type="radio" name="is_hide" value="1" title="是" checked>
+                <input type="radio" name="is_hide" value="0" title="否">
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">通告内容</label>
+            <div class="layui-input-block">
+                <div id="act_edit">
+
+                </div>
+                <script type="text/javascript" src="../static/wangEditor/release/wangEditor.min.js"></script>
+                <!--<script charset="utf-8" src="/static/ueditor/ueditor.config.js"></script>-->
+                <!--<script charset="utf-8" src="/static/ueditor/ueditor.all.min.js"></script>-->
+                <!--<script charset="utf-8" src="/static/ueditor/lang/zh-cn/zh-cn.js"></script>-->
+                <!--<script id="act_editor_edit" name="content" type="text/plain" style="width:1024px;height:500px;"></script>-->
+                <!--<script type="text/javascript">-->
+                <!--if(ue1){-->
+                    <!--UE.delEditor('act_editor_edit')-->
+                <!--}-->
+                <!--var ue1 = UE.getEditor('act_editor_edit');-->
+
+                <!--</script>-->
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="aaa">立即提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+<script>
+    $('.activity_edit_index').click(function () {
+        $.get("activity_index.html",function (res) {
+            $('#activity_edit').html(res);
+        })
+    });
+
+</script>
+<script>
+    var E = window.wangEditor;
+    var editor_edit = new E('#act_edit');
+    editor_edit.customConfig.uploadFileName = 'file';
+    editor_edit.customConfig.uploadImgMaxSize = 2 * 1024 * 1024;
+    editor_edit.customConfig.uploadImgServer = 'http://192.168.1.17:8001/index.php/admin/activity/upload';
+    editor_edit.customConfig.uploadImgMaxLength = 1;
+    editor_edit.create();
+    editor_edit.customConfig.onchange = function (html) {
+        // 监控变化，同步更新到 textarea
+        $('#act_edit').val(html)
+    };
+    layui.use(['layer', 'form','upload'], function(){
+        var $ = layui.jquery
+            ,upload = layui.upload
+            ,layer = layui.layer
+            ,from = layui.form;
+        from.render();
+        var id = $('.act_id').val();
+        $.get(`${__FORPUBLIC__}/admin/activity/edit`,{id:id},function (res) {
+            var form =layui.form;
+            form.val('activity_edit', {
+                "a_title": res.data.a_title
+                ,"a_time": res.data.a_time
+                //,"like[write]": true //复选框选中状态
+                ,"is_hot": String(res.data.is_hot) //开关状态
+                ,"is_hide": String(res.data.is_hide)
+            });
+            // 或者 var editor = new E( document.getElementById('editor') )
+            editor_edit.txt.html(res.data.content);
+            // UE.getEditor('act_editor_edit').ready(function() {
+            //     //this是当前创建的编辑器实例
+            //     console.log(111);
+            //     this.setContent('内容')
+            // })
+        });
+        $('#aaa').click(function () {
+            var a_title = $.trim($('#a_title').val());
+            var content = editor_edit.txt.html();//$.trim(ue1.getContent());
+            var a_time = $('.a_time').val();
+            var is_hot = $('input[name="is_hot"]:checked').val();
+            var is_hide = $('input[name="is_hide"]:checked').val();
+            if(a_title=="" || content=="" || a_time==""){
+                layer.msg("输入框不能为空");
+                return;
+            }
+            if(a_title.length>50){
+                layer.msg("活动标题不能超过50个字");
+                return;
+            }
+            var jsonData = {
+                'is_hot' : is_hot,
+                'is_hide' : is_hide,
+                'a_title' : a_title,
+                'id' : id,
+                'a_time' : a_time,
+                'content' : content
+            };
+            var jsonObj = JSON.stringify(jsonData);
+            $.ajax({
+                url:`${__FORPUBLIC__}/admin/activity/edit`,
+                type:'post',
+                contentType:"application/json;charset=utf-8,application/json",
+                data:jsonObj,
+                success:function (res) {
+                    layer.msg(res.msg);
+                    if(res.code==1){
+                        $.get("activity_index.html",function (data) {
+                            $('#activity_edit').html(data);
+                        })
+                    }
+                }
+            });
+            //get();
+        });
+    });
+</script>
+<script>
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+
+        //常规用法
+        laydate.render({
+            elem: '#newstime'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd HH:mm:ss'
+        });
+    });
+</script>
+</div>

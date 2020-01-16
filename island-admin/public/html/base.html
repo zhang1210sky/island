@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>layout 后台大布局 - Layui</title>
+    <script>
+         window.__FORPUBLIC__ = "../index.php";
+         // var cssUrl = window.public+'/static/layui/css/layui.css';
+         // function dynamicLoadCss(url) {
+         //     var head = document.getElementsByTagName('head')[0];
+         //     var link = document.createElement('link');
+         //     link.type='text/css';
+         //     link.rel = 'stylesheet';
+         //     link.href = url;
+         //     head.appendChild(link);
+         // }
+         // dynamicLoadCss(cssUrl)
+        // 在 window 作用域中 window.__PUBLIC__
+    </script>
+    <link rel="stylesheet" href="../static/layui/css/layui.css">
+    <script src="../static/jquery/jquery.min.js"></script>
+    <script src="../static/layui/layui.js"></script>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo">layui 后台布局</div>
+        <!-- 头部区域（可配合layui已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left">
+<!--            <li class="layui-nav-item"><a href="">控制台</a></li>-->
+            <li class="layui-nav-item"><a href="javascript:;" class="clear">清除缓存</a></li>
+<!--            <li class="layui-nav-item">-->
+<!--                <a href="javascript:;">其它系统</a>-->
+<!--                <dl class="layui-nav-child">-->
+<!--                    <dd><a href="">邮件管理</a></dd>-->
+<!--                    <dd><a href="">消息管理</a></dd>-->
+<!--                    <dd><a href="">授权管理</a></dd>-->
+<!--                </dl>-->
+<!--            </li>-->
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="javascript:;" id="User_name">
+<!--                    <img src="http://t.cn/RCzsdCq" class="layui-nav-img">-->
+                    <!--{$Think.session.zjy_admin}-->
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:;" class="person">修改密码</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item"><a href="../index.php/admin/login/logout">退了</a></li>
+        </ul>
+    </div>
+
+<!--    <div class="layui-header" style="background:white;width:85.5%;float: right;border-bottom:1px solid #e8e8e8;height:41px;line-height: 41px;">-->
+<!--        <span class="layui-breadcrumb" lay-separator="|" style="padding-left: 20px;">-->
+
+<!--          <a href="">娱乐<i class="layui-icon layui-unselect layui-tab-close">ဆ</i></a>-->
+<!--          <a href="">八卦</a>-->
+<!--          <a href="">体育</a>-->
+<!--          <a href="">搞笑</a>-->
+<!--          <a href="">视频</a>-->
+<!--          <a href="">游戏</a>-->
+<!--          <a href="">综艺</a>-->
+<!--        </span>-->
+<!--    </div>-->
+
+    <div class="layui-side layui-bg-black">
+            <div class="layui-side-scroll">
+                <ul class="start layui-nav layui-nav-tree" lay-shrink="all">
+                    <!--循环-->
+
+                </ul>
+            </div>
+    </div>
+    <div class="layui-body" style="padding:20px;">
+        <!-- 内容主体区域 -->
+        zjy
+    </div>
+
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+    </div>
+</div>
+
+<script>
+    //获取用户名
+    $.get(`${__FORPUBLIC__}/admin/login/user_name`,function (res) {
+
+        $('#User_name').html(res.data);
+    });
+
+    //获取菜单
+    $.get(`${__FORPUBLIC__}/admin/base/show_menu`,function (res) {
+        var li = '';
+        $(res.data).each(function (i, it) {
+            //console.log(it.length);
+            //console.log(it.rule_name);
+            //{if $v.module=="admin"}{else /}class="layui-nav-child"{/if}
+            if(it.parent_id==0) {
+                li += '<li class="layui-nav-item item_shrink_only">\n' +
+                    '<a lay-direction="2"><cite>' + it.rule_name + '</cite><span class="layui-nav-more"></span></a>\n' +
+                    '<ul class="layui-nav-child">\n';
+                $(res.data).each(function (i1, it1) {
+                    if (it1.parent_id == it.id) {
+                        if(it1.module=='admin'){
+                            li += '<li><a class="v" data-v-action='+it1.action+' data-v-controller='+it1.controller+' data-v-module='+it1.module+'>&nbsp;&nbsp;'+it1.rule_name+'<span></span></a><ul>';
+                        }else{
+                            li += '<li><a>&nbsp;&nbsp;'+it1.rule_name+'<span class="layui-nav-more"></span></a><ul class="layui-nav-child">';
+                        }
+                        $(res.data).each(function (i2, it2) {
+                            if (it2.parent_id == it1.id) {
+                                li += '<li><a class="v2" data-v2-action='+it2.action+' data-v2-controller='+it2.controller+' data-v2-module='+it2.module+'>&nbsp;&nbsp;&nbsp;&nbsp;'+it2.rule_name+'</a></li>';
+                               }
+                            });
+                        li += '</ul></li>';
+                    }
+                });
+                li += '</ul></li>';
+            }
+        });
+        $('.start').html(li);
+
+        layui.use(['element','form'], function(){
+            var element = layui.element
+                ,form = layui.form;
+            //监听导航点击
+            element.init();
+            form.render();
+        });
+    })
+</script>
+<script>
+    //JavaScript代码区域
+
+</script>
+<script>
+    layui.use('layer', function() {
+        var layer = layui.layer,
+            $ = layui.jquery;
+       // $('.v2').click(function(){
+        $(document).off("click",".v2").on("click",".v2",function(){
+            var v2_module = $(this).data('v2-module');
+            var v2_controller = $(this).data('v2-controller');
+            var v2_action = $(this).data('v2-action');
+            $.ajax({
+                url:v2_controller+"_"+v2_action+".html",
+                //url:"/html/menu_index.html",
+                success:function(res) {
+                    $('.layui-body').html(res);
+                }
+            })
+        });
+        $(document).off("click",".v").on("click",".v",function(){
+            var v_module = $(this).data('v-module');
+            var v_controller = $(this).data('v-controller');
+            var v_action = $(this).data('v-action');
+
+            $.ajax({
+                url:v_controller+"_"+v_action+".html",
+                //url:"/"+v_module+"/"+v_controller+"/"+v_action,
+                success:function(res) {
+                    $('.layui-body').html(res);
+                }
+            });
+        });
+    });
+
+</script>
+<script>
+    layui.use('layer', function() {
+        var layer = layui.layer,
+            $ = layui.jquery;
+        $('.clear').click(function(){
+            $.ajax({
+                url: `${__FORPUBLIC__}/admin/admin/clearCache`,
+                success:function(res) {
+                    layer.msg(res.msg);
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            })
+        });
+        $('.person').click(function(){
+            $.get('admin_person.html',function (data) {
+                $('.layui-body').html(data);
+            })
+        });
+    });
+</script>
+</body>
+</html>

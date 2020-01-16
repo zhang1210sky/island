@@ -1,0 +1,72 @@
+<div id="admin_menu_add">
+    <div class="layui-tab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">系统菜单管理</li>
+            <li><a class="menu_add">添加新菜单</a></li>
+        </ul>
+    </div>
+    <table class="layui-hide" id="test" lay-filter="test"></table>
+
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+
+</div>
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            ,url:`${__FORPUBLIC__}/admin/menu/index`
+            ,toolbar: '#toolbarDemo'
+            ,cols: [[
+                {field:'id', title:'编号', fixed: 'left', width:80}
+                ,{field:'rule_name', title:'名称'}
+                ,{field:'module', title:'模块'}
+                ,{field:'controller', title:'控制器'}
+                ,{field:'action', title:'方法'}
+                ,{field:'param', title:'参数'}
+                ,{field:'is_show', title:'状态'}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
+            ]]
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            var id = data.id;
+
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    $.get(`${__FORPUBLIC__}/admin/menu/delete`,{id:id},function (res) {
+                        layer.msg(res.msg);
+                        if(res.code == 1){
+                            obj.del();
+                            layer.close(index);
+                        }
+                    });
+                });
+            } else if(obj.event === 'edit'){
+                var id_html = '<input type="hidden" name="id" class="id" value='+id+'>';
+                $.get("menu_edit.html",function (res) {
+                    $('#admin_menu_add').html(id_html+res);
+                });
+            }
+        });
+    });
+</script>
+<script>
+
+    $(document).off("click",".menu_add").on("click",".menu_add",function(){
+    //$('.menu_add').click(function () {
+        $.get("menu_add.html", function(res){
+            $('#admin_menu_add').html(res);
+        });
+    });
+
+</script>
+
+
+

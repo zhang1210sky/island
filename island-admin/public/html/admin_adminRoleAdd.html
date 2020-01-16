@@ -1,0 +1,142 @@
+<div id="admin_role_add">
+<!--<span class="layui-breadcrumb">-->
+      <!--<a href="javascrip:;">权限组</a>-->
+    <!--<a href="javascrip:;">角色权限管理</a>-->
+      <!--<a><cite>新增角色</cite></a>-->
+    <!--</span>-->
+    <div class="layui-tab">
+        <ul class="layui-tab-title">
+            <li><a id="adminRoleAdd_adminRoleIndex">角色权限管理</a></li>
+            <li class="layui-this">新增角色</li>
+        </ul>
+    </div>
+    <div style="margin-top: 20px;">
+    </div>
+    <form class="layui-form" id="admin">
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色名</label>
+            <input type="checkbox" title="全选" lay-skin="primary" lay-filter="c_all" name="" value="" >
+            <div class="layui-input-inline">
+                <input name="role_name" id="role_name" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input" type="text">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-collapse role_index" style="margin-left:110px;">
+
+
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn role_add_commit" lay-submit lay-filter="admin">立即提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $('#adminRoleAdd_adminRoleIndex').click(function () {
+       $.get("admin_adminRoleIndex.html",function (res) {
+           $('#admin_role_add').html(res);
+       })
+    });
+</script>
+<script>
+    $.get(`${__FORPUBLIC__}/admin/admin/adminRoleAdd`,function (res) {
+        var role_index = '';
+        $(res.data).each(function (i, it) {
+            if(it.parent_id==0) {
+                role_index += '<div class="layui-colla-item">\n' +
+                    '<h2 class="layui-colla-title" style="background:0;">'+it.rule_name+'</h2>\n' +
+                    '<div class="layui-colla-content layui-show">\n' +
+                    '<table>';
+                $(res.data).each(function (i, it2) {
+                    if (it2.parent_id == it.id) {
+                        role_index += '<tbody><tr><td>'+it2.str+'<input type="checkbox" title='+it2.rule_name+' class="rule_id" lay-skin="primary" name="rule_id[]" value='+it2.id+' lay-filter="c_first"></td></tr>';
+
+                        $(res.data).each(function (i, it3) {
+                            if (it3.parent_id == it2.id) {
+                                role_index += '<tr><td>'+it3.str+'<input type="checkbox" title='+it3.rule_name+' class="rule_id" lay-skin="primary" name="rule_id[]" value='+it3.id+' lay-filter="c_son"></td></tr>';
+
+                            }
+                        });
+                        role_index += '</tbody>';
+                    }
+                });
+                role_index += '</table></div></div>';
+            }
+        });
+        $('.role_index').html(role_index);
+        layui.use(['layer', 'form'], function() {
+            var layer = layui.layer,
+                $ = layui.jquery,
+                form = layui.form;
+                form.render();
+            //全选
+            form.on('checkbox(c_all)', function (data) {
+                var a = data.elem.checked;
+                if (a == true) {
+                    $(".rule_id").prop("checked", true);
+                    form.render('checkbox');
+                } else {
+                    $(".rule_id").prop("checked", false);
+                    form.render('checkbox');
+                }
+            });
+            //选中之后 其他子菜单全选c_first
+            form.on('checkbox(c_first)', function (data) {
+                var a = data.elem.checked;
+                if (a == true) {
+                    $(this).parent().parent().parent().find('input').prop("checked", true);
+                    form.render('checkbox');
+                } else {
+                    $(this).parent().parent().parent().find('input').prop("checked", false);
+                    form.render('checkbox');
+                }
+            });
+            //选中子菜单后 上级菜单也会选中
+            form.on('checkbox(c_son)', function (data) {
+                var a = data.elem.checked;
+                if (a == true) {
+                    $(this).parent().parent().parent().find('input:first').prop("checked", true);
+                    form.render('checkbox');
+                }
+            });
+
+            //表单提交
+            $('.role_add_commit').click(function () {
+                var role_name = $.trim($('#role_name').val());
+                var checkbox=[];
+                $("[class = 'rule_id']:checkbox").each(function(i){
+                    if ($(this).prop("checked") == true){
+                        checkbox.push($(this).val());
+                    }
+                });
+                var jsonData = {
+                    'role_name' : role_name,
+                    'rule_id' :checkbox
+                };
+                var jsonObj = JSON.stringify(jsonData);
+                $.ajax({
+                    url:`${__FORPUBLIC__}/admin/admin/adminRoleAdd`,
+                    type:'post',
+                    contentType:"application/json;charset=utf-8,application/json",
+                    data:jsonObj,
+                    success:function (res) {
+                        layer.msg(res.msg);
+                        if(res.code==1){
+                            $.get("admin_adminRoleAdd.html",function (data) {
+                                $('#admin_role_add').html(data);
+                            })
+                        }
+                    }
+                });
+
+            });
+        });
+
+    });
+
+    // $('.admin_admin_adminRoleIndex').addClass('layui-this');
+    // $('.admin_admin_adminRoleIndex').parent().parent().addClass('layui-nav-itemed');
+</script>

@@ -1,0 +1,119 @@
+<div id="banner_edit">
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li><a href="javascript:;"  class="banner_edit_index">banner列表</a></li>
+            <li class="layui-this">修改banner图片</li>
+        </ul>
+    </div>
+    <form class="layui-form"  lay-filter="banner_edit">
+        <div class="layui-form-item">
+            <label class="layui-form-label">外链地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="url" id="url" required  lay-verify="required" placeholder="请输入外链地址" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <button type="button" class="layui-btn" id="banner">上传图片</button>
+            </label>
+            <div class="layui-input-inline">
+                <p>活动图片</p>
+                <img class="layui-upload-img"  id="demo1" style="width:150px;height: 150px;">
+                <p id="demoText"></p>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="banner_edit_commit">立即提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $('.banner_edit_index').click(function () {
+        $.get("banner_index.html",function (res) {
+            $('#banner_edit').html(res);
+        })
+    })
+</script>
+<script>
+    var id = $('.banner_id').val();
+    $.get(`${__FORPUBLIC__}/admin/banner/edit`,{id:id},function (res) {
+        var form =layui.form;
+        form.val('banner_edit', {
+            "url": res.data.url
+        });
+        $('#demo1').attr('src', "../"+res.data.banner_img);
+    });
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#banner'
+            ,url: `${__FORPUBLIC__}/admin/banner/img_edit?id=`+id
+            ,size: 1024*4 //限定大小
+            ,accept: 'images' //只允许上传图片
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#demo1').attr('src', result); //图片链接（base64）
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                layer.msg(res.msg);
+                // if(res.code > 0){
+                //     return layer.msg(res.msg);
+                // }
+                // //上传成功
+                // layer.msg('更新图片成功');
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+    });
+</script>
+<script>
+    layui.use(['layer', 'form'], function(){
+        var $ = layui.jquery
+            ,layer = layui.layer
+            ,from = layui.form;
+        from.render();
+        $('#banner_edit_commit').click(function () {
+            var url = $.trim($('#url').val());
+
+            if( url.length>255){
+                layer.msg("外链地址太长");
+                return;
+            }
+            var jsonData = {
+                'id':id,
+                'url' : url,
+            };
+            var jsonObj = JSON.stringify(jsonData);
+            $.ajax({
+                url:`${__FORPUBLIC__}/admin/banner/edit`,
+                type:'post',
+                contentType:"application/json;charset=utf-8,application/json",
+                data:jsonObj,
+                success:function (res) {
+                    layer.msg(res.msg);
+                    if(res.code==1){
+                        $.get("banner_index.html",function (data) {
+                            $('#banner_edit').html(data);
+                        })
+                    }
+                }
+            });
+            //get();
+        });
+    });
+</script>

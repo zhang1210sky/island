@@ -1,0 +1,85 @@
+<div id="banner_index">
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li class="layui-this">banner列表</li>
+            <li><a href="javascript:;" class="banner_index_add">添加banner图片</a></li>
+        </ul>
+    </div>
+
+
+    <style>
+        .layui-table-cell{
+            height:auto !important;
+        }
+    </style>
+
+    <table class="layui-hide" id="banner" lay-filter="banner"></table>
+
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+    <script type="text/html" id="imgtmp">
+        <div><img src="../{{d.banner_img}}" /></div>
+    </script>
+
+</div>
+<script>
+    $('.banner_index_add').click(function () {
+        $.get('banner_add.html',function (res) {
+            $('#banner_index').html(res);
+        })
+    });
+    layui.use(['table','form'], function(){
+        var table = layui.table
+            ,form = layui.form;
+        form.render();
+        table.render({
+            elem: '#banner'
+            ,url:`${__FORPUBLIC__}/admin/banner/index`
+            ,cols: [[
+                {field:'banner_img', title:'banner图片', templet: "#imgtmp" }
+                ,{field:'url', title:'外链地址(N岛居资讯 A活动 C商户)',edit: 'text' }
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:200}
+            ]]
+        });
+        //监听单元格编辑
+        table.on('edit(banner)', function(obj){
+            var value = obj.value //得到修改后的值
+                ,id = obj.data.id //得到所在行所有键值
+                ,field = obj.field; //得到字段
+            var data = {};
+            data[field]=value;
+            data.id=id;
+             $.post(`${__FORPUBLIC__}/admin/banner/url_edit`,{data:data},function (res) {
+                    layer.msg(res.msg);
+             },"json")
+        });
+        //监听行工具事件
+        table.on('tool(banner)', function(obj){
+            var data = obj.data;
+            var id = data.id;
+            var banner_id = '<input type="hidden" name="id" class="banner_id" value='+id+'>';
+            if(obj.event === 'del'){
+                layer.confirm('确定要删除么！', function(index){
+                    $.get(`${__FORPUBLIC__}/admin/banner/delete`,{id:id},function (res3) {
+                        layer.msg(res3.msg);
+                        if(res3.code == 1){
+                            obj.del();
+                            layer.close(index);
+                        }
+                    });
+                });
+            } else if(obj.event === 'edit'){
+
+                $.get("banner_edit.html",function (res1) {
+                    $('#banner_index').html(banner_id+res1);
+                });
+
+            }
+        });
+    });
+</script>
+
+
+

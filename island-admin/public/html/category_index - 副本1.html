@@ -1,0 +1,136 @@
+{extend name="public:base"/}
+{block name="body"}
+    <span class="layui-breadcrumb">
+      <a href="javascrip:;">导航栏</a>
+      <a><cite>导航分类列表</cite></a>
+    </span>
+    <div class="layui-tab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">导航分类列表</li>
+            <li><a href="__PUBLIC__/admin/category/add">新增导航分类</a></li>
+        </ul>
+    </div>
+    <table class="layui-table">
+        <colgroup>
+            <col width="50">
+            <col width="250">
+            <col width="250">
+            <col width="150">
+<!--            <col width="200">-->
+            <col width="100">
+        </colgroup>
+        <thead>
+        <tr>
+            <th>排序</th>
+            <th>分类名称</th>
+            <th>链接地址</th>
+            <th>发布文章类型</th>
+<!--            <th>发布文章操作</th>-->
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <form class="layui-form" id="admin">
+        {volist name="cate" id="vo"}
+        {eq name="vo.parent_id" value="0"}
+        <tr>
+            <td><input type="text" name="orders[]" value="{$vo.order}" style="width: 20px;" class="orders"><input type="hidden" name="id[]" value="{$vo.id}"></td>
+            <td>
+                <span><a href="javascript:void(0)">{$vo.str|raw}{$vo.cname}</a></span>
+            </td>
+            <td>
+                <span><a href="javascript:void(0)">{$vo.c_url} </a></span>
+            </td>
+            <td>
+                <span><a href="javascript:void(0)">{switch $vo.status }{case 0 }无状态{/case}{case 1}单篇选文{/case}{default /}多篇选文{/switch}</a></span>
+            </td>
+<!--            {neq name="0" value="$vo.status"}-->
+<!--            <td class="operation-menu">-->
+<!--                <div class="layui-btn-group">-->
+<!--                <a href={switch $vo.status }{case 1 }"__PUBLIC__/admin/walk/add?cid={$vo.id}"{/case}{case 2}"__PUBLIC__/admin/dynamic/add?cid={$vo.id}"{/case}{/switch} class="layui-btn layui-btn-xs layui-btn-primary" style="margin-right: 0;font-size:12px;">发布文章</a>-->
+<!--                    <a href={switch $vo.status }{case 1 }"__PUBLIC__/admin/walk/index"{/case}{case 2}"__PUBLIC__/admin/dynamic/index?cid={$vo.id}"{/case}{/switch} class="layui-btn layui-btn-xs layui-btn-primary" style="margin-right: 0;font-size:12px;">查看文章</a>-->
+<!--                </div>-->
+<!--            </td>-->
+<!--            {else /}-->
+<!--            <td> </td>-->
+<!--            {/neq}-->
+            <td class="operation-menu">
+                <div class="layui-btn-group">
+                <a href="__PUBLIC__/admin/category/edit?id={$vo.id}" class="layui-btn layui-btn-xs layui-btn-primary" style="margin-right: 0;font-size:12px;">编辑 </a>
+<!--                <a href="__PUBLIC__/admin/category/delete?id={$vo.id}" onclick="return confirm('确定要删除么')" style="color:red;">移除</a>-->
+                </div>
+            </td>
+        </tr>
+                    {volist name="cate" id="v"}
+                    {eq name="v.parent_id" value="$vo.id"}
+                    <tr>
+                        <td><input type="text" name="orders[]" value="{$v.order}" style="width: 20px;" class="orders"><input type="hidden" name="id[]" value="{$v.id}"></td>
+                        <td>
+                            <span><a href="javascript:void(0)">{$v.str|raw}{$v.cname}</a></span>
+                        </td>
+                        <td>
+                            <span><a href="javascript:void(0)">{$v.c_url}</a></span>
+                        </td>
+                        <td>
+                            <span><a href="javascript:void(0)">{switch $v.status }{case 0 }无状态{/case}{case 1}单篇选文{/case}{default /}多篇选文{/switch} </a></span>
+                        </td>
+<!--                        {neq name="0" value="$v.status"}-->
+<!--                        <td class="operation-menu">-->
+<!--                            <div class="layui-btn-group">-->
+<!--                                <a href={switch $v.status }{case 1 }"__PUBLIC__/admin/walk/add?cid={$v.id}"{/case}{case 2}"__PUBLIC__/admin/dynamic/add?cid={$v.id}"{/case}{/switch} class="layui-btn layui-btn-xs layui-btn-primary" style="margin-right: 0;font-size:12px;">发布文章</a>-->
+<!--                                <a href={switch $v.status }{case 1 }"__PUBLIC__/admin/walk/index"{/case}{case 2}"__PUBLIC__/admin/dynamic/index?cid={$v.id}"{/case}{/switch} class="layui-btn layui-btn-xs layui-btn-primary" style="margin-right: 0;font-size:12px;">查看文章</a>-->
+<!--                            </div>-->
+<!--                        </td>-->
+<!--                        {else /}-->
+<!--                        <td> </td>-->
+<!--                        {/neq}-->
+                        <td class="operation-menu">
+                            <div class="layui-btn-group">
+                            <a href="__PUBLIC__/admin/category/edit?id={$v.id}" class="layui-btn layui-btn-xs a_menu layui-btn-primary" style="margin-right: 0;font-size:12px;">编辑</a>
+                            <a href="__PUBLIC__/admin/category/delete?id={$v.id}" class="layui-btn layui-btn-xs layui-btn-primary" onclick="return confirm('确认要删除吗?')" style="margin-right: 0;font-size:12px;">移除</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {/eq}
+                    {/volist}
+        {/eq}
+        {/volist}
+            <button class="layui-btn layui-btn-sm" lay-submit lay-filter="admin">更新排序</button>
+        </form>
+        </tbody>
+    </table>
+
+
+{/block}
+{block name="footer"}
+{/block}
+{block name="js"}
+<script>
+    layui.use(['layer', 'form'], function() {
+        var layer = layui.layer,
+            $ = layui.jquery,
+            form = layui.form;
+        $(window).on('load', function() {
+            form.on('submit(admin)', function(data) {
+                $.ajax({
+                    url:"__PUBLIC__/admin/category/order",
+                    data:$('#admin').serialize(),
+                    type:'post',
+                    async: false,
+                    success:function(res) {
+                        layer.msg(res.msg);
+                        if(res.code==0){
+                            setTimeout(function () {
+                                location.href="__PUBLIC__/admin/category/index";
+                            },1000)
+                        }
+                    }
+                })
+                return false;
+            });
+        });
+    });
+    $('.admin_category_index').addClass('layui-this');
+    $('.admin_category_index').parent().parent().addClass('layui-nav-itemed');
+</script>
+{/block}

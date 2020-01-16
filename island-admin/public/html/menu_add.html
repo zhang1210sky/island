@@ -1,0 +1,143 @@
+<div id="admin_menu_add">
+    <div class="layui-tab">
+        <ul class="layui-tab-title">
+            <li><a class="menu_index">系统菜单管理</a></li>
+            <li class="layui-this">添加新菜单</li>
+        </ul>
+    </div>
+    <form class="layui-form" id="admin">
+        <div class="layui-form-item">
+            <label class="layui-form-label">上级菜单</label>
+            <div class="layui-input-inline menu_cart">
+
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">名称</label>
+            <div class="layui-input-inline">
+                <input name="rule_name" id="rule_name" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input" type="text">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">模块名</label>
+            <div class="layui-input-inline">
+                <input name="module" id="module" placeholder="请输入" autocomplete="off" class="layui-input" type="text">
+            </div>
+            <div class="layui-form-mid layui-word-aux">如果仅作为父级菜单，请留空</div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">控制器名</label>
+            <div class="layui-input-inline">
+                <input name="controller" id="controller" placeholder="请输入" autocomplete="off" class="layui-input" type="text">
+            </div>
+            <div class="layui-form-mid layui-word-aux">如果仅作为父级菜单，请留空</div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">方法名</label>
+            <div class="layui-input-inline">
+                <input name="action" id="action" placeholder="请输入" autocomplete="off" class="layui-input" type="text">
+            </div>
+            <div class="layui-form-mid layui-word-aux">如果仅作为父级菜单，请留空</div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">参数</label>
+            <div class="layui-input-inline">
+                <input name="param" id="param" placeholder="请输入" autocomplete="off" class="layui-input" type="text">
+            </div>
+            <div class="layui-form-mid layui-word-aux">请根据需求填写</div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-inline">
+                <select name="is_show" id="is_show" lay-filter="aihao">
+                    <option value="1" selected="">显示在左侧菜单</option>
+                    <option value="0">只做为操作节点</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="menu_add_commit">立即提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $(document).off("click",".menu_index").on("click",".menu_index",function(){
+        $.get("menu_index.html",function (res) {
+            $('#admin_menu_add').html(res);
+        })
+    });
+    $.get(`${__FORPUBLIC__}/admin/menu/add`,function (res) {
+        var select = '<select name="parent_id" id="parent_id" lay-verify="required">\n' +
+            '<option value="0">作为顶级分类</option>';
+        $(res.data).each(function (i, it) {
+            if(it.parent_id==0) {
+                select += '<option value='+it.id+'>&emsp;&emsp;'+it.rule_name+'</option>';
+                $(res.data).each(function (i, it2) {
+                    if (it2.parent_id == it.id) {
+                        select += '<option value='+it2.id+'>&emsp;&emsp;&emsp;&emsp;'+it2.rule_name+'</option>';
+                    }
+                });
+            }
+        });
+        select += '</select>';
+        $('.menu_cart').html(select);
+        layui.use(['layer', 'form'], function() {
+            var layer = layui.layer,
+                $ = layui.jquery,
+                form = layui.form;
+                form.render();
+            $('#menu_add_commit').click(function () {
+                var rule_name = $.trim($('#rule_name').val());
+                var module = $('#module').val();
+                var controller = $('#controller').val();
+                var action = $('#action').val();
+                var param = $('#param').val();
+                var parent_id = $('#parent_id').val();
+                var is_show = $('#is_show').val();
+                console.log(parent_id);
+                console.log(is_show);
+                var jsonData = {
+                    'rule_name' : rule_name,
+                    'module' : module,
+                    'controller' : controller,
+                    'action' : action,
+                    'param' : param,
+                    'parent_id' : parent_id,
+                    'is_show' : is_show
+                };
+                var jsonObj = JSON.stringify(jsonData);
+                $.ajax({
+                    url:`${__FORPUBLIC__}/admin/menu/add`,
+                    type:'post',
+                    contentType:"application/json;charset=utf-8,application/json",
+                    data:jsonObj,
+                    success:function (res) {
+                        layer.msg(res.msg);
+                        if(res.code==1){
+                            $.get("menu_add.html",function (data) {
+                                //window.parent.location.reload();
+                                 $('#admin_menu_add').html(data);
+                            })
+                        }
+                    }
+                });
+            });
+        });
+    });
+
+    // function renderForm(){
+    //
+    //     layui.use('form', function(){
+    //
+    //         var form = layui.form;//高版本建议把括号去掉，有的低版本，需要加()
+    //
+    //         form.render();
+    //
+    //     });
+    //
+    // }
+</script>
+

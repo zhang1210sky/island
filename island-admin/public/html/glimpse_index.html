@@ -1,0 +1,66 @@
+<div id="glimpse_index">
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li class="layui-this">掠影列表</li>
+            <li><a href="javascript:;" class="glimpse_index_add">添加掠影详情</a></li>
+        </ul>
+    </div>
+    <table class="layui-hide" id="glimpse" lay-filter="glimpse"></table>
+
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+
+</div>
+<script>
+    $('.glimpse_index_add').click(function () {
+        $.get("glimpse_add.html",function (res) {
+            $('#glimpse_index').html(res);
+        })
+    });
+    layui.use('table', function(){
+        var table = layui.table
+             ,form = layui.form;
+        //更改报名状态
+        table.render({
+            elem: '#glimpse'
+            ,url:`${__FORPUBLIC__}/admin/glimpse/index`
+            ,toolbar: '#toolbarDemo'
+            ,cols: [[
+                {field:'title', title:'掠影主题' ,fixed: 'left'}
+                ,{field:'s_title', title:'二级标题'}
+                ,{field:'glimpse_time', title:'发布时间'}
+                // ,{field:'address', title:'活动地址'}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:200}
+            ]]
+            ,page: true
+        });
+        //监听行工具事件
+        table.on('tool(glimpse)', function(obj){
+            var data = obj.data;
+            var id = data.id;
+            var glim_id = '<input type="hidden" name="id" class="glim_id" value='+id+'>';
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    $.get(`${__FORPUBLIC__}/admin/glimpse/delete`,{id:id},function (res3) {
+                            layer.msg(res3.msg);
+                            if(res3.code == 1){
+                                obj.del();
+                                layer.close(index);
+                            }
+                    });
+                });
+            } else if(obj.event === 'edit'){
+
+                $.get("glimpse_edit.html",function (res1) {
+                    $('#glimpse_index').html(glim_id+res1);
+                });
+
+            }
+        });
+    });
+</script>
+
+
+

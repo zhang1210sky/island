@@ -1,0 +1,117 @@
+<div id="activity_index">
+    <!--<style>-->
+        <!--.pagination li {display: inline-block;margin-right: -1px;padding: 5px;border: 1px solid #e2e2e2;min-width: 20px;text-align: center;}-->
+        <!--.pagination li.active {background: #009688;color: #fff;border: 1px solid #009688;}-->
+        <!--.pagination li a {display: block;text-align: center;}-->
+    <!--</style>-->
+    <!--<span class="layui-breadcrumb">-->
+    <!--<a href="javascrip:;">海岛置业</a>-->
+    <!--<a href="javascrip:;">预约看房</a>-->
+    <!--<a><cite>预约记录</cite></a>-->
+    <!--</span>-->
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li class="layui-this">社区通告列表</li>
+            <li><a href="javascript:;" class="activity_index_add">添加社区通告详情</a></li>
+        </ul>
+    </div>
+
+    <!--<div class="layui-input-inline">-->
+        <!--<input type="text" name="keyword" placeholder="请输入关键字" autocomplete="off" class="layui-input">-->
+    <!--</div>-->
+    <!--<div class="layui-input-inline">-->
+    <!--<input type="text" id="time" name="time" placeholder="请输入时间范围" autocomplete="off" class="layui-input" value="">-->
+    <!--</div>-->
+    <!--<button class="layui-btn layui-btn-normal apartment_search">查询</button>-->
+
+    <table class="layui-hide" id="test" lay-filter="test"></table>
+    <!--<script type="text/html" id="toolbarDemo">-->
+        <!--<div class="layui-btn-container">-->
+            <!--<button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>-->
+            <!--<button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>-->
+            <!--<button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全选</button>-->
+        <!--</div>-->
+    <!--</script>-->
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+
+
+    <!--<div id="page_activity">-->
+
+    <!--</div>-->
+</div>
+<script>
+    $('.activity_index_add').click(function () {
+        $.get("activity_add.html",function (res) {
+            $('#activity_index').html(res);
+        })
+    });
+    layui.use('table', function(){
+        var table = layui.table;
+
+        table.render({
+            elem: '#test'
+            ,url:`${__FORPUBLIC__}/admin/activity/index`
+            ,toolbar: '#toolbarDemo'
+            ,cols: [[
+                {field:'id', title:'Id' , width:100,fixed: 'left'}
+                ,{field:'a_title', title:'通告主题'}
+                ,{field:'a_time', title:'发布时间'}
+                ,{field:'is_hot', title:'置顶', width:100,templet: function(d){
+                        if(d.is_hot==0){
+                            return "否"
+                        }else{
+                            return "已置顶"
+                        }
+                    }}
+                ,{field:'is_hide', title:'隐藏', width:100,templet: function(d){
+                            if(d.is_hide==0){
+                                return "否"
+                            }else{
+                                return "已隐藏"
+                            }
+                        }}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
+            ]]
+            ,page: true
+        });
+        //监听行工具事件
+        table.on('tool(test)', function(obj){
+            var data = obj.data;
+            var id = data.id;
+            
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    $.get(`${__FORPUBLIC__}/admin/activity/delete`,{id:id},function (res) {
+                            layer.msg(res.msg);
+                            if(res.code == 1){
+                                obj.del();
+                                layer.close(index);
+                            }
+                    });
+                });
+            } else if(obj.event === 'edit'){
+                var role_id = '<input type="hidden" name="id" class="act_id" value='+id+'>';
+                $.get("activity_edit.html",function (res) {
+                    $('#activity_index').html(role_id+res);
+                });
+
+                // layer.prompt({
+                //     formType: 2
+                //     ,value: data.a_title
+                // }, function(value, index){
+                //
+                //     obj.update({
+                //         a_title: value
+                //     });
+                //     layer.close(index);
+                // });
+            }
+        });
+    });
+</script>
+
+
+

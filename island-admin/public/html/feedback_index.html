@@ -1,0 +1,54 @@
+<div id="feedback_index">
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li class="layui-this">反馈列表</li>
+        </ul>
+    </div>
+
+
+    <table class="layui-hide" id="feedback" lay-filter="feedback"></table>
+
+    <script type="text/html" id="barDemo">
+
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+
+</div>
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+
+        table.render({
+            elem: '#feedback'
+            ,url:`${__FORPUBLIC__}/admin/feedback/index`
+            ,toolbar: '#toolbarDemo'
+            ,cols: [[
+                {field:'phone', title:'手机号' ,fixed: 'left', width:150}
+                ,{field:'feedback', title:'反馈内容'}
+                ,{field:'time', title:'提交时间',width:200}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:150}
+            ]]
+            ,page: true
+        });
+        //监听行工具事件
+        table.on('tool(feedback)', function(obj){
+            var data = obj.data;
+            var id = data.id;
+
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    $.get(`${__FORPUBLIC__}/admin/feedback/delete`,{id:id},function (res) {
+                        layer.msg(res.msg);
+                        if(res.code == 0){
+                            obj.del();
+                            layer.close(index);
+                        }
+                    });
+                });
+            }
+        });
+    });
+</script>
+
+
+

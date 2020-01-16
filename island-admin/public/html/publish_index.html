@@ -1,0 +1,107 @@
+<div id="publish_index">
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li class="layui-this">活动列表</li>
+            <li><a href="javascript:;" class="publish_index_add">添加活动详情</a></li>
+        </ul>
+    </div>
+    <table class="layui-hide" id="publish" lay-filter="publish"></table>
+
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="sign">报名详情</a>
+    </script>
+
+    <script type="text/html" id="switchTpl">
+
+        <input type="checkbox" name="state" class="state_{{d.id}}" value="{{d.state}}" data-id="{{d.id}}" lay-skin="switch" lay-text="活动已开启|活动已结束" lay-filter="state" {{ d.state == 1 ? 'checked' : '' }}>
+
+    </script>
+    <!--<div id="page_activity">-->
+
+    <!--</div>-->
+</div>
+<script>
+    $('.publish_index_add').click(function () {
+        $.get("publish_add.html",function (res) {
+            $('#publish_index').html(res);
+        })
+    });
+    layui.use('table', function(){
+        var table = layui.table
+             ,form = layui.form;
+        //更改报名状态
+        form.on('switch(state)', function(obj){
+            var id = $(this).data('id');
+            var state = obj.value;
+            $.get(`${__FORPUBLIC__}/admin/publish/state`,{state:state,id:id},function (res) {
+                layer.msg(res.msg);
+                $('.state_'+id).val(res.data);
+            })
+        });
+        table.render({
+            elem: '#publish'
+            ,url:`${__FORPUBLIC__}/admin/publish/index`
+            ,toolbar: '#toolbarDemo'
+            ,cols: [[
+                {field:'id', title:'Id' ,fixed: 'left'}
+                ,{field:'title', title:'通告主题'}
+                ,{field:'publish_time', title:'发布时间'}
+                ,{field:'start_time', title:'开始时间'}
+                // ,{field:'address', title:'活动地址'}
+                ,{field:'phone', title:'电话'}
+                ,{field:'p_number', title:'人数限制'}
+                ,{field:'state', title:'状态', templet: '#switchTpl', unresize: true}
+                ,{field:'is_hot', title:'置顶', width:100,templet: function(d){
+                        if(d.is_hot==0){
+                            return "否"
+                        }else{
+                            return "已置顶"
+                        }
+                    }}
+                ,{field:'is_hide', title:'隐藏', width:100,templet: function(d){
+                            if(d.is_hide==0){
+                                return "否"
+                            }else{
+                                return "已隐藏"
+                            }
+                        }}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:200}
+            ]]
+            ,page: true
+        });
+        //监听行工具事件
+        table.on('tool(publish)', function(obj){
+            var data = obj.data;
+            var id = data.id;
+            var pub_id = '<input type="hidden" name="id" class="pub_id" value='+id+'>';
+            if(obj.event === 'del'){
+                layer.confirm('请谨慎操作，会将活动底下的报名信息一起删除！！', function(index){
+                    $.get(`${__FORPUBLIC__}/admin/publish/delete`,{id:id},function (res3) {
+                            layer.msg(res3.msg);
+                            if(res3.code == 1){
+                                obj.del();
+                                layer.close(index);
+                            }
+                    });
+                });
+            } else if(obj.event === 'edit'){
+
+                $.get("publish_edit.html",function (res1) {
+                    $('#publish_index').html(pub_id+res1);
+                });
+
+            } else if(obj.event === 'sign'){
+
+                $.get("publish_sign.html",function (res2) {
+                    $('#publish_index').html(pub_id+res2);
+                });
+
+            }
+        });
+    });
+</script>
+
+
+

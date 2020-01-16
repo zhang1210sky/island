@@ -1,0 +1,91 @@
+<div id="mail_index">
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li class="layui-this">前台导航栏</li>
+        </ul>
+    </div>
+
+    <script type="text/html" id="switchTpl">
+
+        <input type="checkbox" name="state" class="state_{{d.id}}" value="{{d.is_show}}" data-id="{{d.id}}" lay-skin="switch" lay-text="开启显示|关闭隐藏" lay-filter="is_show" {{ d.is_show == 0 ? 'checked' : '' }}>
+
+    </script>
+
+    <table class="layui-hide" id="mail" lay-filter="mail"></table>
+
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+
+
+</div>
+<script>
+
+    layui.use(['table','form'], function(){
+        var table = layui.table
+            ,form = layui.form;
+        form.render();
+        //更改显示隐藏状态状态
+        form.on('switch(is_show)', function(obj){
+            var id = $(this).data('id');
+            var state = obj.value;
+            $.get(`${__FORPUBLIC__}/admin/category/state`,{state:state,id:id},function (res) {
+                layer.msg(res.msg);
+                $('.state_'+id).val(res.data);
+            })
+        });
+        table.render({
+            elem: '#mail'
+            ,url:`${__FORPUBLIC__}/admin/category/index`
+            ,toolbar: '#toolbarDemo'
+            ,cols: [[
+
+                {field:'cname', title:'分类名称',edit: 'text'}
+                ,{field:'c_url', title:'外链地址',edit: 'text'}
+                ,{field:'appid', title:'小程序appId',edit: 'text'}
+                ,{field:'order', title:'排序(请按栏目数字排序)',edit: 'text'}
+                ,{field:'is_show', title:'显示隐藏', templet: '#switchTpl'}
+                //,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:200}
+            ]]
+        });
+        //监听单元格编辑
+        table.on('edit(mail)', function(obj){
+            var value = obj.value //得到修改后的值
+                ,id = obj.data.id //得到所在行所有键值
+                ,field = obj.field; //得到字段
+            var data = {};
+            data[field]=value;
+            data.id=id;
+             $.post(`${__FORPUBLIC__}/admin/category/edit`,{data:data},function (res) {
+                    layer.msg(res.msg);
+             },"json")
+        });
+        //监听行工具事件
+        table.on('tool(mail)', function(obj){
+            var data = obj.data;
+            var id = data.id;
+            var mail_id = '<input type="hidden" name="id" class="mail_id" value='+id+'>';
+            if(obj.event === 'del'){
+                layer.confirm('确定要删除么！', function(index){
+                    $.get(`${__FORPUBLIC__}/admin/mail/delete`,{id:id},function (res3) {
+                        layer.msg(res3.msg);
+                        if(res3.code == 1){
+                            obj.del();
+                            layer.close(index);
+                        }
+                    });
+                });
+            } else if(obj.event === 'edit'){
+
+                $.get("mail_edit.html",function (res1) {
+                    $('#mail_index').html(mail_id+res1);
+                });
+
+            }
+        });
+    });
+</script>
+
+
+

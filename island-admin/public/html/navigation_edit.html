@@ -1,0 +1,367 @@
+<div id="navigation_edit">
+    <style>
+        .demo2{
+            margin-top: 10px;
+            text-align: center;
+        }
+        .demo2 a{
+            margin-right: 0;
+            font-size:12px;
+            margin-top: 5px;
+        }
+        .demo2 img{
+            width:100px;
+            height:100px;
+        }
+        .flo{
+            float:left;
+            margin-left:10px;
+        }
+    </style>
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li><a href="javascript:;"  class="navigation_edit_index">商户信息列表</a></li>
+            <li class="layui-this">修改商户信息</li>
+        </ul>
+    </div>
+    <form class="layui-form" id="form_navigation_edit" lay-filter="form_navigation_edit">
+        <div class="layui-form-item">
+            <label class="layui-form-label">分类</label>
+            <div class="layui-input-inline">
+                <select name="b_cart" id="b_cart" lay-filter="b_cart">
+                    <option value="0">请选择</option>
+                    <option value="1">美食</option>
+                    <option value="2">饮品</option>
+                    <option value="3">便利</option>
+                    <option value="4">银行</option>
+                    <option value="5">生活服务</option>
+                    <option value="6">医疗服务</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">商业类型</label>
+            <div class="layui-input-inline">
+                <select name="b_type" lay-verify="required" id="b_type">
+
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">位置区域</label>
+            <div class="layui-input-inline">
+                <select name="area" lay-verify="required" id="area">
+                    <option value="1">1号岛</option>
+                    <option value="2">2号岛</option>
+                    <option value="3">3号岛</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">商家名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" id="name" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="a_title layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="address" id="address" required  lay-verify="required" placeholder="请输入城市名+地址" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">营业时间</label>
+            <div class="layui-input-block">
+                <input type="text" name="hours" id="hours" required  lay-verify="required" placeholder="请输入营业时间" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">电话</label>
+            <div class="layui-input-block">
+                <input type="tel" name="phone" id="phone" required  lay-verify="required" placeholder="请输入电话" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">经度</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="longitude" id="longitude" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">纬度</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="latitude" id="latitude" class="layui-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否置顶</label>
+            <div class="layui-input-block">
+                <input type="radio" name="is_hot" value="1" title="是">
+                <input type="radio" name="is_hot" value="0" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否隐藏</label>
+            <div class="layui-input-block">
+                <input type="radio" name="is_hide" value="1" title="是">
+                <input type="radio" name="is_hide" value="0" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否外卖</label>
+            <div class="layui-input-block">
+                <input type="radio" name="is_out" value="1" title="是">
+                <input type="radio" name="is_out" value="0" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-form-label">
+                <button type="button" class="layui-btn" id="navi_edit_img">上传图片</button>
+            </div>
+            <blockquote class="layui-input-block layui-elem-quote layui-quote-nm">
+                预览图：
+               <div class="navi_upload_only demo2">
+
+               </div>
+                <div style="clear: both;"></div>
+
+            </blockquote>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">商户介绍</label>
+            <div class="layui-input-block">
+                <textarea name="introduce" id="introduce" placeholder="请输入商户介绍" class="layui-textarea a_introduce" style="width:100%;"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">商户备注</label>
+            <div class="layui-input-block">
+                <textarea name="remarks" id="remarks" placeholder="请输入商户备注" class="layui-textarea a_introduce" style="width:100%;"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="navigation_edit_commit">立即提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $('.navigation_edit_index').click(function () {
+        $.get("navigation_index.html",function (res) {
+            $('#navigation_edit').html(res);
+        })
+    });
+    var id = $('.navi_id').val();
+    //显示
+    $.get(`${__FORPUBLIC__}/admin/navigation/edit`,{id:id},function (res) {
+
+        //渲染数据
+        var form =layui.form;
+        form.val('form_navigation_edit', {
+            "longitude" : res.data.longitude
+            ,"latitude" : res.data.latitude
+            ,"name": res.data.name
+            ,"address": res.data.address
+            ,"phone": res.data.phone
+            ,"hours": res.data.hours
+            ,"introduce": res.data.introduce
+            ,"remarks": res.data.remarks
+            ,"is_hot": String(res.data.is_hot) //开关状态
+            ,"is_hide": String(res.data.is_hide)
+            ,"is_out": String(res.data.is_out)
+            ,'area' : String(res.data.area)
+            ,'b_cart' : String(res.data.b_cart)
+            ,'b_type' : String(res.data.b_type)
+        });
+        var opt = "";
+        $(res.data.cart_list).each(function (i, it) {
+
+            opt += "<option value=" + it.id;
+            if(it.id==res.data.b_type){
+                opt += " selected";
+            }
+            opt +='>' + it.cart_name + '</option>';
+
+        });
+        $("select[name='b_type']").html(opt);
+        form.render('select');
+
+        //渲染图片
+        var img = "";
+        $(res.data.img_list).each(function (i, im) {
+
+            img += "<div class='layui-upload-list flo navi_delete_img_"+im.id+"'>" +
+                "<div>" +
+                "<img class='layui-upload-img' src=../"+im.n_img+">" +
+                "</div>" +
+                "<a href='javascript:;' class='layui-btn layui-btn-xs layui-btn-primary navi_delete_img'  data-id="+im.id+">删除</a>" +
+                "</div>";
+        });
+
+        $('.demo2').html(img);
+        //二级联动
+        form.on('select(b_cart)', function(data){
+            var cart_id=data.elem.value;
+            $.ajax({
+                type: 'POST',
+                url: `${__FORPUBLIC__}/admin/navigation/get_cart`,
+                data: {cart_id:cart_id},
+                dataType:  'json',
+                success:function(e){
+                    //empty() 方法从被选元素移除所有内容
+                    $("select[name='b_type']").empty();
+                    var html = "";
+                    $(e.data).each(function (v, k) {
+                        html += "<option value='" + k.id + "'>" + k.cart_name + "</option>";
+                    });
+                    //把遍历的数据放到select表里面
+                    $("select[name='b_type']").append(html);
+                    //从新刷新了一下下拉框
+                    form.render('select');      //重新渲染
+                }
+            });
+        });
+
+    });
+</script>
+<script>
+    //上传文件
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+        var id = $('.navi_id').val();
+        var uploadInst = upload.render({
+            elem: '#navi_edit_img'
+            ,url: `${__FORPUBLIC__}/admin/navigation/navi_file_insert?id=`+id
+            ,multiple: true
+            ,size: 1024*4 //限定大小
+            ,accept: 'images' //只允许上传图片
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg(res.msg);
+                }
+                layer.msg(res.msg);
+                //上传成功
+                //layer.msg('上传成功，请继续上传图片');
+                var add = "<div class=\"layui-upload-list flo navi_delete_img_"+res.data.id+"\">" +
+                    "<div>" +
+                    "<img class='layui-upload-img' src=../"+res.data.n_img+">" +
+                    "</div>" +
+                    "<a href='javascript:;' class='layui-btn layui-btn-xs layui-btn-primary navi_delete_img' data-id="+res.data.id+">删除</a>" +
+                    "</div>";
+
+                $('.navi_upload_only').append(add);
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                layer.msg("上传失败，请返回重新上传");
+            }
+        })
+    });
+</script>
+<script>
+    //点击删除图片
+    //$(document).on("click",".apart_delete_img",function(){
+    $(document).off("click",".navi_delete_img").on("click",".navi_delete_img",function(){
+        var sid = $(this).data('id');
+        $.get(`${__FORPUBLIC__}/admin/navigation/navi_del_img`,{id:sid,navid:id},function (res) {
+            if(res.code==0){
+                layer.msg(res.msg);
+                $(".navi_delete_img_"+sid).remove();
+            }
+        })
+    });
+
+</script>
+<script>
+    layui.use(['layer', 'form','upload'], function(){
+        var $ = layui.jquery
+            ,from = layui.form;
+        from.render();
+        $('#navigation_edit_commit').click(function () {
+            var b_cart = $('#b_cart').val();
+            var b_type = $('#b_type').val();
+            var area = $('#area').val();
+            var name = $.trim($('#name').val());
+            var address = $('#address').val();
+            var phone = $('#phone').val();
+            var introduce = $('#introduce').val();
+            var remarks = $('#remarks').val();
+            var hours = $('#hours').val();
+            var longitude = $.trim($('#longitude').val());
+            var latitude = $.trim($('#latitude').val());
+            var is_hot = $('input[name="is_hot"]:checked').val();
+            var is_hide = $('input[name="is_hide"]:checked').val();
+            var is_out = $('input[name="is_out"]:checked').val();
+            if(longitude=='' || latitude ==''){
+                layer.msg("经纬度不能为空");
+                return;
+            }
+            if(!$.isNumeric(longitude) || !$.isNumeric(latitude) ){
+                layer.msg("经纬度格式不对，请重新输入");
+                return;
+            }
+            if(b_cart=='0'){
+                layer.msg("请选择分类");
+                return;
+            }
+            if(name=="" || name.length>50){
+                layer.msg("主题不能为空或大于50个字");
+                return;
+            }
+            if(address=="" || address.length>50){
+                layer.msg("地址不能为空或大于50个字");
+                return;
+            }
+
+            if(hours=="" || hours.length>50){
+                layer.msg("营业时间不能为空或大于50个字");
+                return;
+            }
+            var jsonData = {
+                'id' : id,
+                'b_cart' : b_cart,
+                'b_type' : b_type,
+                'area' : area,
+                'name' : name,
+                'address' : address,
+                'phone' : phone,
+                'is_hot' : is_hot,
+                'is_hide' : is_hide,
+                'is_out' : is_out,
+                'introduce' : introduce,
+                'remarks' : remarks,
+                'hours' : hours,
+                'longitude': longitude,
+                'latitude': latitude
+            };
+            var jsonObj = JSON.stringify(jsonData);
+
+            $.ajax({
+                url:`${__FORPUBLIC__}/admin/navigation/edit`,
+                type:'post',
+                contentType:"application/json;charset=utf-8,application/json",
+                data:jsonObj,
+                success:function (res) {
+                    layer.msg(res.msg);
+                    if(res.code==1){
+                        $.get("navigation_index.html",function (data) {
+                            $('#navigation_edit').html(data);
+                        })
+                    }
+                }
+            });
+
+        });
+    });
+</script>

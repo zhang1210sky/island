@@ -1,0 +1,327 @@
+<div id="navigation_add">
+    <!--<script>-->
+        <!--window.UEDITOR_HOME_URL = "__PUBLIC__/static/ueditor/";-->
+    <!--</script>-->
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li><a href="javascript:;"  class="navigation_add_index">商户信息列表</a></li>
+            <li class="layui-this">添加商户信息</li>
+        </ul>
+    </div>
+    <form class="layui-form" id="form_apartment_add">
+        <div class="layui-form-item">
+            <label class="layui-form-label">分类</label>
+            <div class="layui-input-inline">
+                <select name="b_cart" id="b_cart" lay-filter="b_cart">
+                    <option value="0">请选择</option>
+                    <option value="1">美食</option>
+                    <option value="2">饮品</option>
+                    <option value="3">便利</option>
+                    <option value="4">银行</option>
+                    <option value="5">生活服务</option>
+                    <option value="6">医疗服务</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">商业类型</label>
+            <div class="layui-input-inline">
+                <select name="b_type" lay-verify="required" id="b_type">
+
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">位置区域</label>
+            <div class="layui-input-inline">
+                <select name="area" lay-verify="required" id="area">
+                    <option value="1">1号岛</option>
+                    <option value="2">2号岛</option>
+                    <option value="3">3号岛</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">商家名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" id="name" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="a_title layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="address" id="address" required  lay-verify="required" placeholder="请输入城市名+地址" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">营业时间</label>
+            <div class="layui-input-block">
+                <input type="text" name="hours" id="hours" required  lay-verify="required" placeholder="请输入营业时间" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">电话</label>
+            <div class="layui-input-block">
+                <input type="tel" name="phone" id="phone" required  lay-verify="required" placeholder="请输入电话" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">经度</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="longitude" id="longitude" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">纬度</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="latitude" id="latitude" class="layui-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否置顶</label>
+            <div class="layui-input-block">
+                <input type="radio" name="is_hot" value="1" title="是">
+                <input type="radio" name="is_hot" value="0" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否隐藏</label>
+            <div class="layui-input-block">
+                <input type="radio" name="is_hide" value="1" title="是">
+                <input type="radio" name="is_hide" value="0" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否外卖</label>
+            <div class="layui-input-block">
+                <input type="radio" name="is_out" value="1" title="是">
+                <input type="radio" name="is_out" value="0" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item">
+
+            <div class="layui-form-label">
+                <button type="button" class="layui-btn" id="upload_navigation_img">上传图片</button>
+            </div>
+            <blockquote class="layui-input-block layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+                预览图：
+                <div class="layui-upload-list" id="navigation_demo">
+
+                </div>
+                <div style="clear:both"></div>
+            </blockquote>
+        </div>
+        <div class="navigationAppend">
+
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">商户介绍</label>
+            <div class="layui-input-block">
+                <textarea name="introduce" id="introduce" placeholder="请输入商户介绍" class="layui-textarea a_introduce" style="width:100%;"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">商户备注</label>
+            <div class="layui-input-block">
+                <textarea name="remarks" id="remarks" placeholder="请输入商户备注" class="layui-textarea a_introduce" style="width:100%;"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="navigation_add_commit">立即提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+
+    $('.navigation_add_index').click(function () {
+        $.get("navigation_index.html",function (res) {
+            $('#navigation_add').html(res);
+        })
+    });
+    $('#navigation_add_commit').click(function () {
+        var navigation_img_id = [];
+        var b_cart = $('#b_cart').val();
+        var b_type = $('#b_type').val();
+        var area = $('#area').val();
+        var name = $.trim($('#name').val());
+        var address = $('#address').val();
+        var hours = $('#hours').val();
+        var phone = $('#phone').val();
+        var introduce = $('#introduce').val();
+        var remarks = $('#remarks').val();
+        var is_hot = $('input[name="is_hot"]:checked').val();
+        var is_hide = $('input[name="is_hide"]:checked').val();
+        var is_out = $('input[name="is_out"]:checked').val();
+        var longitude = $.trim($('#longitude').val());
+        var latitude = $.trim($('#latitude').val());
+
+        $('.navigation_img_id').each(function(i){
+            navigation_img_id.push($(this).val());
+        });
+        if(longitude=='' || latitude ==''){
+            layer.msg("经纬度不能为空");
+            return;
+        }
+        if(!$.isNumeric(longitude) || !$.isNumeric(latitude) ){
+            layer.msg("经纬度格式不对，请重新输入");
+            return;
+        }
+        console.log(b_cart);
+        if(b_cart=='0'){
+            layer.msg("请选择分类");
+            return;
+        }
+        if(navigation_img_id==undefined){
+            layer.msg("请上传图片");return;
+        }
+        if(name=="" || name.length>50){
+            layer.msg("主题不能为空或大于50个字");
+            return;
+        }
+        if(hours=="" || hours.length>50){
+            layer.msg("营业时间不能为空或大于50个字");
+            return;
+        }
+        if(address=="" || address.length>50){
+            layer.msg("地址不能为空或大于50个字");
+            return;
+        }
+        // if(isNaN(phone) || phone.length>20){
+        //     layer.msg("电话格式不对");
+        //     return;
+        // }
+
+
+        var jsonData = {
+            'navigation_img_id' : navigation_img_id,
+            'b_cart' : b_cart,
+            'b_type' : b_type,
+            'area' : area,
+            'name' : name,
+            'address' : address,
+            'phone' : phone,
+            'is_hot' : is_hot,
+            'is_hide' : is_hide,
+            'is_out' : is_out,
+            'introduce' : introduce,
+            'remarks' : remarks,
+            'hours' :hours,
+            'longitude': longitude,
+            'latitude': latitude
+        };
+        var jsonObj = JSON.stringify(jsonData);
+        $.ajax({
+            url:`${__FORPUBLIC__}/admin/navigation/add`,
+            type:'post',
+            contentType:"application/json;charset=utf-8,application/json",
+            data:jsonObj,
+            success:function (res) {
+                layer.msg(res.msg);
+                if(res.code==1){
+                    $.get("navigation_add.html",function (data) {
+                        $('#navigation_add').html(data);
+                    })
+                }
+            }
+        });
+        //get();
+    });
+
+</script>
+<script>
+    layui.use(['layer', 'form','upload'], function(){
+        var $ = layui.jquery
+            ,upload = layui.upload
+            ,layer = layui.layer
+            ,form = layui.form;
+        form.render();
+
+        //二级联动
+        form.on('select(b_cart)', function(data){
+            var cart_id=data.elem.value;
+            $.ajax({
+                type: 'POST',
+                url: `${__FORPUBLIC__}/admin/navigation/get_cart`,
+                data: {cart_id:cart_id},
+                dataType:  'json',
+                success:function(e){
+                    //empty() 方法从被选元素移除所有内容
+                    $("select[name='b_type']").empty();
+                    var html = "";
+                    $(e.data).each(function (v, k) {
+                        html += "<option value='" + k.id + "'>" + k.cart_name + "</option>";
+                    });
+                    //把遍历的数据放到select表里面
+                    $("select[name='b_type']").append(html);
+                    //从新刷新了一下下拉框
+                    form.render('select');      //重新渲染
+                }
+            });
+        });
+
+        layui.use('upload', function(){
+            var $ = layui.jquery
+                ,upload = layui.upload;
+
+            //普通图片上传
+            var uploadInst = upload.render({
+                elem: '#upload_navigation_img'
+                ,url: `${__FORPUBLIC__}/admin/navigation/upload`
+                ,multiple: true
+                ,size: 1024*4 //限定大小
+                ,accept: 'images' //只允许上传图片
+                ,before: function(obj){
+
+                    //预读本地文件示例，不支持ie8
+                    obj.preview(function(index, file, result){
+                        $('#navigation_demo').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img" style="width:100px;height:100px;margin-left:10px;">')
+                    });
+                }
+                ,choose:function (res) {
+
+                }
+                ,allDone: function(res){
+
+                }
+                ,done: function(res){
+                    //如果上传失败
+
+                    layer.msg(res.msg);
+                    if(res.code > 0){
+                        return layer.msg('上传失败');
+                    }
+                    $('.navigationAppend').append('<input type="hidden" name="navigation_img_id[]" class="navigation_img_id" value="'+res.msg+'"/>');
+                    //上传成功
+                }
+                ,error: function(){
+                    //演示失败状态，并实现重传
+                    var demoText = $('#demoText');
+                    demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                    demoText.find('.demo-reload').on('click', function(){
+                        uploadInst.upload();
+                    });
+                }
+            });
+
+        });
+    });
+</script>
+<script>
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+
+        //常规用法
+        laydate.render({
+            elem: '#newstime'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd HH:mm:ss'
+        });
+    });
+</script>

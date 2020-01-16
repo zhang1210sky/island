@@ -1,0 +1,154 @@
+<div id="activity_add">
+    <!--<script>-->
+        <!--window.UEDITOR_HOME_URL = "/static/ueditor/";-->
+    <!--</script>-->
+    <div class="layui-tab" style="margin-top: 20px;">  
+        <ul class="layui-tab-title">
+            <li><a href="javascript:;"  class="activity_add_index">社区通告列表</a></li>
+            <li class="layui-this">添加社区通告详情</li>
+        </ul>
+    </div>
+    <form class="layui-form" id="form_activity_add">
+        <div class="layui-form-item">
+            <label class="layui-form-label">社区通告主题</label>
+            <div class="layui-input-block">
+                <input type="text" name="a_title" id="a_title" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="a_title layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">发布时间</label>
+                <div class="layui-input-inline">
+                    <input required  lay-verify="required"  type="text" id="newstime" name="a_time"  placeholder="请选择发布时间" autocomplete="off" class="layui-input a_time" value="">
+                </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否置顶</label>
+            <div class="layui-input-block">
+                <input type="radio" name="is_hot" value="1" title="是">
+                <input type="radio" name="is_hot" value="0" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否隐藏</label>
+            <div class="layui-input-block">
+                <input type="radio" name="is_hide" value="1" title="是">
+                <input type="radio" name="is_hide" value="0" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">通告内容</label>
+            <div class="layui-input-block">
+                <div id="act_add">
+
+                </div>
+                <script type="text/javascript" src="../static/wangEditor/release/wangEditor.min.js"></script>
+                <!--<script charset="utf-8" src="/static/ueditor/ueditor.config.js"></script>-->
+                <!--<script charset="utf-8" src="/static/ueditor/ueditor.all.min.js"></script>-->
+                <!--<script charset="utf-8" src="/static/ueditor/lang/zh-cn/zh-cn.js"></script>-->
+                <!--<script id="act_editor_add" name="content" type="text/plain" style="width:1024px;height:500px;"></script>-->
+                <!--<script type="text/javascript">-->
+                    <!--UE.delEditor('act_editor_add');-->
+                <!--var ue = UE.getEditor('act_editor_add');-->
+                <!--</script>-->
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="aaa">立即提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $('.activity_add_index').click(function () {
+        $.get("activity_index.html",function (res) {
+            $('#activity_add').html(res);
+        })
+    })
+</script>
+<script>
+    var E = window.wangEditor;
+    var editor_add = new E('#act_add');
+    //editor_add.customConfig.debug = true;
+    editor_add.customConfig.uploadFileName = 'file';
+    editor_add.customConfig.uploadImgMaxSize = 2 * 1024 * 1024;
+    editor_add.customConfig.uploadImgServer = '../index.php/admin/activity/upload';
+    editor_add.customConfig.uploadImgMaxLength = 1;
+    // editor_add.customConfig.uploadImgHooks = {
+    //     customInsert: function (insertImg, result, editor) {
+    //         // 图片上传并返回结果，自定义插入图片的事件（而不是编辑器自动插入图片！！！）
+    //         // insertImg 是插入图片的函数，editor 是编辑器对象，result 是服务器端返回的结果
+    //
+    //         // 举例：假如上传图片成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
+    //         var url = result.data[0];
+    //         console.log(url);
+    //         insertImg(url)
+    //
+    //         // result 必须是一个 JSON 格式字符串！！！否则报错
+    //     }
+    // };
+
+    editor_add.create();
+
+    layui.use(['layer', 'form','upload'], function(){
+        var $ = layui.jquery
+            ,upload = layui.upload
+            ,layer = layui.layer
+            ,from = layui.form;
+             from.render();
+        $('#aaa').click(function () {
+            var a_title = $.trim($('#a_title').val());
+            var content = editor_add.txt.html();//var content =  ue.getContent();
+            var a_time = $('.a_time').val();
+            var is_hot = $('input[name="is_hot"]:checked').val();
+            var is_hide = $('input[name="is_hide"]:checked').val();
+            if(a_title=="" || content=="" || a_time==""){
+                layer.msg("输入框不能为空");
+                return;
+            }
+            if(a_title.length>50){
+                layer.msg("活动标题不能超过50个字");
+                return;
+            }
+            var jsonData = {
+                'a_title' : a_title,
+                'a_time' : a_time,
+                'content' : content,
+                'is_hot' : is_hot,
+                'is_hide' : is_hide
+            };
+            var jsonObj = JSON.stringify(jsonData);
+            $.ajax({
+                url:`${__FORPUBLIC__}/admin/activity/add`,
+                type:'post',
+                contentType:"application/json;charset=utf-8,application/json",
+                data:jsonObj,
+                success:function (res) {
+                    layer.msg(res.msg);
+                    if(res.code==1){
+                        $.get("activity_add.html",function (data) {
+                            $('#activity_add').html(data);
+                        })
+                    }
+                }
+            });
+
+
+            //get();
+        });
+    });
+</script>
+<script>
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+
+        //常规用法
+        laydate.render({
+            elem: '#newstime'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd HH:mm:ss'
+        });
+    });
+</script>

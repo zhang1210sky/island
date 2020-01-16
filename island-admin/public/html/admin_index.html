@@ -1,0 +1,70 @@
+<div id="admin_admin_index">
+    <div class="layui-tab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">用户管理</li>
+            <li><a id="adminIndex_adminAdd">新增用户</a></li>
+        </ul>
+    </div>
+
+    <table class="layui-hide" id="adminIndex" lay-filter="adminIndex"></table>
+
+    <script type="text/html" id="barDemo">
+        {{#  if(d.admin_id == 1){ }}
+        {{# } else { }}
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+        {{#  } }}
+    </script>
+
+</div>
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+
+        table.render({
+            elem: '#adminIndex'
+            ,url:`${__FORPUBLIC__}/admin/admin/index`
+            ,toolbar: '#toolbarDemo'
+            ,cols: [[
+                {field:'admin_id', title:'编号',width:150}
+                ,{field:'role_name', title:'角色名称'}
+                ,{field:'name', title:'用户名'}
+                ,{field:'login_time', title:'最后登录时间'}
+                ,{field:'login_ip', title:'最后登录的ip地址'}
+                ,{fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150}
+            ]]
+            ,page: true
+        });
+        //监听行工具事件
+        table.on('tool(adminIndex)', function(obj){
+            var data = obj.data;
+            var id = data.admin_id;
+
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    console.log(data);
+                    console.log(id);
+                    $.get(`${__FORPUBLIC__}/admin/admin/delete`,{id:id},function (res) {
+                        layer.msg(res.msg);
+                        if(res.code == 1){
+                            obj.del();
+                            layer.close(index);
+                        }
+                    });
+                });
+            } else if(obj.event === 'edit'){
+                var admin_id = '<input type="hidden" name="id" class="id" value='+id+'>';
+                $.get('admin_edit.html',function (res) {
+                    $('#admin_admin_index').html(admin_id+res);
+                })
+
+            }
+        });
+    });
+    $('#adminIndex_adminAdd').click(function () {
+        $.get('admin_add.html',function (res) {
+            $('#admin_admin_index').html(res);
+        })
+    });
+</script>
+

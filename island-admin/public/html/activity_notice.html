@@ -1,0 +1,65 @@
+<div id="activity_notice">
+
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li class="layui-this">通告栏</li>
+        </ul>
+    </div>
+    <form class="layui-form">
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">活动通告栏</label>
+            <div class="layui-input-block">
+                <textarea name="content" id="content" placeholder="请输入通告内容" class="layui-textarea" style="width:100%;"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">物业通告栏</label>
+            <div class="layui-input-block">
+                <textarea name="content" id="property" placeholder="请输入通告内容" class="layui-textarea" style="width:100%;"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="property_notice_commit">立即提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $.get(`${__FORPUBLIC__}/admin/activity/notice`,function (res) {
+        $(res.data).each(function (i,con) {
+            if(con.id==1){
+                $('#content').html(con.content);
+            }else{
+                $('#property').html(con.content);
+            }
+
+        });
+
+    });
+    $('#property_notice_commit').click(function () {
+        var content = $('#content').val();
+        var property = $('#property').val();
+        var jsonData = {
+            'content' : content,
+            'property': property
+        };
+        var jsonObj = JSON.stringify(jsonData);
+        $.ajax({
+            url:`${__FORPUBLIC__}/admin/activity/notice`,
+            type:'post',
+            contentType:"application/json;charset=utf-8,application/json",
+            data:jsonObj,
+            success:function (res) {
+                layer.msg(res.msg);
+                if(res.code==1){
+                    $.get('activity_notice.html',function (res) {
+                        $('#activity_notice').html(res);
+                    });
+                }
+            }
+        });
+    });
+
+</script>

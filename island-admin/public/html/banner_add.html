@@ -1,0 +1,102 @@
+<div id="banner_add">
+    <!--<span class="layui-breadcrumb">-->
+        <!--<a href="javascrip:;">banner</a>-->
+      <!--<a><cite>添加与删除banner图片</cite></a>-->
+    <!--</span>-->
+
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li><a href="javascript:;" class="banner_add_index">banner列表</a></li>
+            <li class="layui-this">添加banner图片</li>
+        </ul>
+    </div>
+    <div class="layui-upload">
+        <button type="button" class="layui-btn" id="test1">上传图片</button>
+        <div class="layui-upload-list">
+            <p>预览图</p>
+            <img class="layui-upload-img" id="demo1" style="width:200px;height: 200px;">
+            <p id="demoText"></p>
+        </div>
+    </div>
+    <!--<div class="layui-upload banner_list" >-->
+
+    <!--</div>-->
+</div>
+<script>
+    // $.get('/admin/banner/add',function (res) {
+    //         var banner = "";
+    //         $(res.data).each(function (i,list) {
+    //             banner += '<div class="layui-upload-list banner_img_'+list.id+'" style="float:left;padding-right: 10px;">\n' +
+    //                 '            <p>已上传的图片</p>\n' +
+    //                 '            <div style="margin-bottom: 10px;">\n' +
+    //                 '                <img class="layui-upload-img" style="width:200px;height: 200px;" src=\"/'+list.banner_img+'\">\n' +
+    //                 '            </div>\n' +
+    //                 '            <a data-id='+list.id+' class="banner_del layui-btn layui-btn-danger" >删除</a>\n' +
+    //                 '        </div>';
+    //         });
+    //         $('.banner_list').html(banner);
+    // });
+    // $(document).off("click",".banner_del").on("click",".banner_del",function(){
+    //     var id = $(this).data('id');
+    //     layer.confirm('确定要删除?', function(index) {
+    //         $.get("/admin/banner/delete",{id:id},function (res) {
+    //             layer.msg(res.msg);
+    //             if(res.code == 1) {
+    //                 $('.banner_img_'+id).remove();
+    //             }else{
+    //                 $.get('/html/banner_add',function (res) {
+    //                     $('#banner_img').html(res);
+    //                 });
+    //             }
+    //         })
+    //     })
+    // })
+</script>
+<script>
+    // $('.admin_banner_add').addClass('layui-this');
+    // $('.admin_banner_add').parent().parent().addClass('layui-nav-itemed');
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+        $('.banner_add_index').click(function () {
+            $.get('banner_index.html',function (res) {
+                $('#banner_add').html(res);
+            })
+        });
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test1'
+            ,url: `${__FORPUBLIC__}/admin/banner/add`
+            ,size: 1024*4 //限定大小
+            ,accept: 'images' //只允许上传图片
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#demo1').attr('src', result); //图片链接（base64）
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg(res.msg);
+                }
+                //console.log(res);
+                //上传成功
+                layer.msg(res.msg);
+
+                $.get('banner_add.html',function (res) {
+                    $('#banner_add').html(res);
+                });
+
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+    });
+</script>

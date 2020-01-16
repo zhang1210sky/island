@@ -1,0 +1,120 @@
+<div id="mail_index">
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li class="layui-this">通讯录列表</li>
+            <li><a href="javascript:;" class="mail_index_add">添加通讯录详情</a></li>
+        </ul>
+    </div>
+    <div class="demoTable">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <input type="text" name="keywords" id="keywords" autocomplete="off" placeholder="请输入关键词" class="layui-input layui-btn-sm">
+                </div>
+                <div class="layui-input-inline" >
+                    <select name="m_cart" id="m_cart">
+                        <option value="">请选择</option>
+                        <option value="0">物业通讯</option>
+                        <option value="1">政府办事</option>
+                        <option value="2">医疗健康</option>
+                    </select>
+                </div>
+                <a class="layui-btn" data-type="reload">搜索</a>
+            </div>
+        </form>
+    </div>
+
+    <table class="layui-hide" id="mail" lay-filter="mail"></table>
+
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+
+    <!--<div id="page_activity">-->
+
+    <!--</div>-->
+</div>
+<script>
+    $('.mail_index_add').click(function () {
+        $.get("mail_add.html",function (res) {
+            $('#mail_index').html(res);
+        })
+    });
+    layui.use(['table','form'], function(){
+        var table = layui.table
+             ,form = layui.form;
+        form.render();
+        table.render({
+            elem: '#mail'
+            ,url:`${__FORPUBLIC__}/admin/mail/index`
+            ,toolbar: '#toolbarDemo'
+            ,cols: [[
+                {field:'m_cart', title:'分类',fixed: 'left', width:150,templet: function(d){
+                        if(d.m_cart==0){
+                            return "物业通讯"
+                        }else if(d.m_cart==1){
+                            return "政府办事"
+                        }else{
+                            return "医疗健康"
+                        }
+                    }}
+                ,{field:'title', title:'主题'}
+                ,{field:'address', title:'地址'}
+                ,{field:'phone', title:'电话'}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:200}
+            ]]
+            ,page: true
+            ,id:'mailReload'
+        });
+        var active = {
+            reload: function(){
+                var m_cart = $('#m_cart');
+                var keywords = $('#keywords');
+                //执行重载
+                table.reload('mailReload', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        key: {
+                            m_cart: m_cart.val(),
+                            keywords: keywords.val()
+                        }
+                    }
+                }, 'data');
+            }
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听行工具事件
+        table.on('tool(mail)', function(obj){
+            var data = obj.data;
+            var id = data.id;
+            var mail_id = '<input type="hidden" name="id" class="mail_id" value='+id+'>';
+            if(obj.event === 'del'){
+                layer.confirm('确定要删除么！', function(index){
+                    $.get(`${__FORPUBLIC__}/admin/mail/delete`,{id:id},function (res3) {
+                            layer.msg(res3.msg);
+                            if(res3.code == 1){
+                                obj.del();
+                                layer.close(index);
+                            }
+                    });
+                });
+            } else if(obj.event === 'edit'){
+
+                $.get("mail_edit.html",function (res1) {
+                    $('#mail_index').html(mail_id+res1);
+                });
+
+            }
+        });
+    });
+</script>
+
+
+

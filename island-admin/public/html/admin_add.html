@@ -1,0 +1,99 @@
+<div id="admin_admin_add">
+<!--<span class="layui-breadcrumb">-->
+      <!--<a href="javascrip:;">用户</a>-->
+      <!--<a href="javascrip:;">用户管理</a>-->
+      <!--<a><cite>新增用户</cite></a>-->
+    <!--</span>-->
+    <div class="layui-tab">
+        <ul class="layui-tab-title">
+            <li><a id="adminAdd_adminIndex">用户管理</a></li>
+            <li class="layui-this">新增用户</li>
+        </ul>
+    </div>
+    <div style="margin-top: 20px;">
+    </div>
+    <form class="layui-form" id="admin">
+        <div class="layui-form-item">
+            <label class="layui-form-label">分组</label>
+            <div class="layui-input-inline">
+                <select name="role_id" lay-filter="aihao" class="role_name_index role_id">
+
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-inline">
+                <input name="name" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input name" type="text">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-inline">
+                <input name="password" lay-verify="pass" placeholder="请输入密码" autocomplete="off" class="layui-input password" type="password">
+            </div>
+            <label class="layui-form-label">重复密码</label>
+            <div class="layui-input-inline">
+                <input name="password_confirm"lay-verify="pass" placeholder="请再次输入密码" autocomplete="off" class="layui-input password_confirm" type="password">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn admin_add_commit" lay-submit lay-filter="admin">立即提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $.get(`${__FORPUBLIC__}/admin/admin/add`,function (res) {
+       var option = "";
+       $(res.data).each(function (i,pt) {
+           option += '<option value='+pt.id+'>'+pt.role_name+'</option>';
+       })
+        $('.role_name_index').html(option);
+        layui.use(['layer', 'form'], function() {
+            var layer = layui.layer,
+                $ = layui.jquery,
+                form = layui.form;
+            form.render();
+
+            $('.admin_add_commit').click(function () {
+                var name = $.trim($('.name').val());
+                var password = $('.password').val();
+                var password_confirm = $('.password_confirm').val();
+                var role_id = $('.role_id').val();
+                var jsonData = {
+                    'name' : name,
+                    'password' : password,
+                    'password_confirm' : password_confirm,
+                    'role_id' : role_id
+                };
+                var jsonObj = JSON.stringify(jsonData);
+                $.ajax({
+                    url:`${__FORPUBLIC__}/admin/admin/add`,
+                    type:'post',
+                    contentType:"application/json;charset=utf-8,application/json",
+                    data:jsonObj,
+                    success:function (res) {
+                        layer.msg(res.msg);
+                        if(res.code==1){
+                            $.get("admin_add.html",function (data) {
+                                $('#admin_admin_add').html(data);
+                            })
+                        }
+                    }
+                });
+            });
+
+
+            $('#adminAdd_adminIndex').click(function () {
+                $.get("admin_index.html",function (res) {
+                    $('#admin_admin_add').html(res);
+                })
+            })
+        });
+    });
+
+
+</script>

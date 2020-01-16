@@ -1,0 +1,203 @@
+<div id="mail_edit">
+
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li><a href="javascript:;"  class="mail_edit_index">通讯录列表</a></li>
+            <li class="layui-this">修改通讯录详情</li>
+        </ul>
+    </div>
+    <form class="layui-form"  lay-filter="mail_edit">
+        <div class="layui-form-item">
+            <label class="layui-form-label">分类</label>
+            <div class="layui-input-inline">
+                <select name="m_cart" id="m_cart" lay-verify="required" lay-filter="m_cart">
+                    <option value="0">物业通讯</option>
+                    <option value="1">政府办事</option>
+                    <option value="2">医疗健康</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item" id="hosip_cart">
+
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">主题</label>
+            <div class="layui-input-block">
+                <input type="text" name="title" id="title" required  lay-verify="required" placeholder="请输入活动主题" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="address" id="address" required  lay-verify="required" placeholder="请输入活动地址" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">电话</label>
+            <div class="layui-input-block">
+                <input type="text" name="phone" id="phone" required  lay-verify="required" placeholder="请输入电话" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <button type="button" class="layui-btn" id="mail">上传图片</button>
+            </label>
+            <div class="layui-input-inline">
+                <p>活动图片</p>
+                <img class="layui-upload-img"  id="demo1" style="width:150px;height: 150px;">
+                <p id="demoText"></p>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="mail_edit_commit">立即提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $('.mail_edit_index').click(function () {
+        $.get("mail_index.html",function (res) {
+            $('#mail_edit').html(res);
+        })
+    })
+</script>
+<script>
+    var id = $('.mail_id').val();
+    $.get(`${__FORPUBLIC__}/admin/mail/edit`,{id:id},function (res) {
+        var form =layui.form;
+        form.val('mail_edit', {
+            "title": res.data.title
+            ,"address": res.data.address
+            ,"phone": res.data.phone
+            ,"m_cart": res.data.m_cart
+        });
+        if(res.data.m_cart==2){
+
+            html = "<label class=\"layui-form-label\">医疗分类</label>\n" +
+                "<div class=\"layui-input-inline\">\n" +
+                "<select name=\"hos_cart\" id=\"hos_cart\">\n" +
+                "<option value=\"1\">海南</option>\n"+
+                "<option value=\"2\">海口</option>\n"+
+                "<option value=\"3\">三亚</option>\n"+
+                "<option value=\"4\">儋州</option>\n"+
+                "</select>\n" +
+                "</div>";
+            $("#hosip_cart").html(html);
+
+            form.render('select');
+            form.val('mail_edit', {
+                "hos_cart": res.data.hos_cart
+            });
+
+        }
+        $('#demo1').attr('src', "../"+res.data.mail_img);
+    });
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#mail'
+            ,url: `${__FORPUBLIC__}/admin/mail/img_edit?id=`+id
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#demo1').attr('src', result); //图片链接（base64）
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                layer.msg(res.msg);
+                // if(res.code > 0){
+                //     return layer.msg(res.msg);
+                // }
+                // //上传成功
+                // layer.msg('更新图片成功');
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+    });
+</script>
+<script>
+    layui.use(['layer', 'form'], function(){
+        var $ = layui.jquery
+            ,layer = layui.layer
+            ,from = layui.form;
+        from.render();
+        //医院分类
+        from.on('select(m_cart)', function(data){
+
+            var cart_id=data.elem.value;
+
+            if(cart_id==2){
+                html = "<label class=\"layui-form-label\">医疗分类</label>\n" +
+                    "<div class=\"layui-input-inline\">\n" +
+                    "<select name=\"hos_cart\" id=\"hos_cart\">\n" +
+                    "<option value=\"1\">海南</option>\n"+
+                    "<option value=\"2\">海口</option>\n"+
+                    "<option value=\"3\">三亚</option>\n"+
+                    "<option value=\"4\">儋州</option>\n"+
+                    "</select>\n" +
+                    "</div>";
+                $("#hosip_cart").html(html);
+
+                from.render('select');
+            }else{
+                $("#hosip_cart").html('');
+            }
+        });
+
+        $('#mail_edit_commit').click(function () {
+            var title = $.trim($('#title').val());
+            var address = $('#address').val();
+            var phone = $('#phone').val();
+            var m_cart = $('#m_cart').val();
+            var hos_cart = $('#hos_cart').val();
+            if(title=="" || title.length>50){
+                layer.msg("主题不能为空或大于50个字");
+                return;
+            }
+            if(address=="" || address.length>50){
+                layer.msg("地址不能为空或大于50个字");
+                return;
+            }
+            if(phone.length>50){
+                layer.msg("电话格式不对");
+                return;
+            }
+            var jsonData = {
+                'id':id,
+                'title' : title,
+                'address' : address,
+                'phone' : phone,
+                'm_cart' : m_cart,
+                'hos_cart' : hos_cart,
+            };
+            var jsonObj = JSON.stringify(jsonData);
+            $.ajax({
+                url:`${__FORPUBLIC__}/admin/mail/edit`,
+                type:'post',
+                contentType:"application/json;charset=utf-8,application/json",
+                data:jsonObj,
+                success:function (res) {
+                    layer.msg(res.msg);
+                    if(res.code==1){
+                        $.get("mail_index.html",function (data) {
+                            $('#mail_edit').html(data);
+                        })
+                    }
+                }
+            });
+            //get();
+        });
+    });
+</script>

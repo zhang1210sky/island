@@ -1,0 +1,79 @@
+<div id="admin_role_index">
+<!--<span class="layui-breadcrumb">-->
+      <!--<a href="javascrip:;">权限组</a>-->
+      <!--<a><cite>角色权限管理</cite></a>-->
+    <!--</span>-->
+    <div class="layui-tab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">角色权限管理</li>
+            <li><a class="adminRoleIndex_adminRoleAdd">新增角色</a></li>
+        </ul>
+    </div>
+
+    <table class="layui-hide" id="adminRoleIndex" lay-filter="adminRoleIndex"></table>
+
+    <script type="text/html" id="barDemo">
+        {{#  if(d.id == 1){ }}
+        {{# } else { }}
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+        {{#  } }}
+    </script>
+
+</div>
+<script>
+    layui.use('table', function(){
+        var table = layui.table;
+
+        table.render({
+            elem: '#adminRoleIndex'
+            ,url:`${__FORPUBLIC__}/admin/admin/adminRoleIndex`
+            ,toolbar: '#toolbarDemo'
+            ,cols: [[
+                {field:'id', title:'编号',width:150}
+                ,{field:'role_name', title:'角色名称'}
+                ,{fixed: 'right', title: '操作', toolbar: '#barDemo', width: 150}
+            ]]
+            ,page: true
+        });
+        //监听行工具事件
+        table.on('tool(adminRoleIndex)', function(obj){
+            var data = obj.data;
+            var id = data.id;
+
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    $.get(`${__FORPUBLIC__}/admin/admin/adminRoleDelete`,{id:id},function (res) {
+                        layer.msg(res.msg);
+                        if(res.code == 1){
+                            obj.del();
+                            layer.close(index);
+                        }
+                    });
+                });
+            } else if(obj.event === 'edit'){
+                var role_id = '<input type="hidden" name="id" class="id" value='+id+'>';
+                $.get('admin_adminRoleEdit.html',function (res) {
+                    $('#admin_role_index').html(role_id+res);
+                })
+
+                // layer.prompt({
+                //     formType: 2
+                //     ,value: data.a_title
+                // }, function(value, index){
+                //
+                //     obj.update({
+                //         a_title: value
+                //     });
+                //     layer.close(index);
+                // });
+            }
+        });
+    });
+    $('.adminRoleIndex_adminRoleAdd').click(function () {
+        $.get('admin_adminRoleAdd.html',function (res) {
+            $('#admin_role_index').html(res);
+        })
+    });
+</script>
+

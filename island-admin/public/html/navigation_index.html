@@ -1,0 +1,156 @@
+<div id="navigation_index">
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li class="layui-this">商户信息列表</li>
+            <li><a href="javascript:;" class="navigation_index_add">添加商户信息</a></li>
+        </ul>
+    </div>
+    <div class="demoTable">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <input type="text" name="keywords" id="keywords" autocomplete="off" placeholder="请输入关键词" class="layui-input layui-btn-sm">
+                </div>
+                <div class="layui-input-inline" >
+                    <select name="n_cart" id="n_cart">
+
+                    </select>
+                </div>
+                <a class="layui-btn" data-type="reload">搜索</a>
+            </div>
+        </form>
+    </div>
+
+    <table class="layui-hide" id="navigation" lay-filter="navigation"></table>
+
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+
+</div>
+<script>
+
+    ///////
+    $('.navigation_index_add').click(function () {
+        $.get("navigation_add.html",function (res) {
+            $('#navigation_index').html(res);
+        })
+    });
+    layui.use('table', function(){
+        var table = layui.table
+            ,form = layui.form;
+        //获取分类所有
+        $.get(`${__FORPUBLIC__}/admin/navigation/cart_index`,function (res) {
+
+            var opp = "<option value=''>请选择</option>";
+            $(res.data).each(function (i,it) {
+                if(it.parent_id==0){
+                    opp += '<option value='+it.id+'>'+it.cart_name+'</option>';
+                }
+                $(res.data).each(function (i,it1) {
+                    if(it1.parent_id==it.id){
+                        opp += '<option value='+it1.id+'>&emsp;&emsp;'+it1.cart_name+'</option>';
+                    }
+                })
+            });
+            $('#n_cart').html(opp);
+            form.render('select');
+        });
+
+        //更改报名状态
+        table.render({
+            elem: '#navigation'
+            ,url:`${__FORPUBLIC__}/admin/navigation/index`
+            ,toolbar: '#toolbarDemo'
+            ,cols: [[
+                {field:'id', title:'Id',fixed: 'left'}
+                ,{field:'sort', title:'排序(数字越大排序越前)',edit: 'text'}
+                ,{field:'b_cart', title:'分类'}
+                ,{field:'b_type', title:'商业类型'}
+                ,{field:'area', title:'位置区域',templet: function(d){
+                        if(d.area==1){
+                            return "1号岛"
+                        }else if(d.area==2){
+                            return "2号岛"
+                        }else{
+                            return "3号岛"
+                        }
+                    }}
+                ,{field:'name', title:'商户名称'}
+                ,{field:'address', title:'地址'}
+                ,{field:'is_out', title:'是否可以外卖',templet: function(d){
+                        if(d.is_out==0){
+                            return "否"
+                        }else{
+                            return "是"
+                        }
+                    }}
+                ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:200}
+            ]]
+            ,page: true
+            ,id:'navigationReload'
+        });
+        //监听单元格编辑
+        table.on('edit(navigation)', function(obj){
+            var value = obj.value //得到修改后的值
+                ,id = obj.data.id //得到所在行所有键值
+                ,field = obj.field; //得到字段
+            var data = {};
+            data[field]=value;
+            data.id=id;
+            $.post(`${__FORPUBLIC__}/admin/navigation/sort_edit`,{data:data},function (res) {
+                layer.msg(res.msg);
+            },"json")
+        });
+        var active = {
+            reload: function(){
+                var n_cart = $('#n_cart');
+                var keywords = $('#keywords');
+                //执行重载
+                table.reload('navigationReload', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    ,where: {
+                        key: {
+                            n_cart: n_cart.val(),
+                            keywords: keywords.val()
+                        }
+                    }
+                }, 'data');
+            }
+        };
+        $('.demoTable .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        //监听行工具事件
+        table.on('tool(navigation)', function(obj){
+            var data = obj.data;
+            var id = data.id;
+            var navi_id = '<input type="hidden" name="id" class="navi_id" value='+id+'>';
+            if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    $.get(`${__FORPUBLIC__}/admin/navigation/delete`,{id:id},function (res3) {
+                        layer.msg(res3.msg);
+                        if(res3.code == 1){
+                            obj.del();
+                            layer.close(index);
+                        }
+                    });
+                });
+            } else if(obj.event === 'edit'){
+
+                $.get("navigation_edit.html",function (res1) {
+                    $('#navigation_index').html(navi_id+res1);
+                });
+
+            }
+        });
+    });
+</script>
+
+
+

@@ -1,0 +1,68 @@
+<div id="admin_personal">
+<div class="layui-tab">
+    <ul class="layui-tab-title">
+        <li class="layui-this">修改个人密码</li>
+    </ul>
+</div>
+<form class="layui-form" id="admin" style="margin-top: 20px;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">用户名</label>
+        <div class="layui-input-inline">
+            <input name="name" id="name" lay-verify="required" autocomplete="off" class="layui-input" type="text">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">原密码</label>
+        <div class="layui-input-inline">
+            <input name="password_old" lay-verify="pass" placeholder="请输入原密码" autocomplete="off" class="layui-input" type="password">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">新密码</label>
+        <div class="layui-input-inline">
+            <input name="password" lay-verify="pass" placeholder="请输入新密码" autocomplete="off" class="layui-input" type="password">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">重复新密码</label>
+        <div class="layui-input-inline">
+            <input name="password_confirm" lay-verify="pass" placeholder="请再次输入新密码" autocomplete="off" class="layui-input" type="password">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="admin">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+    <div>
+<script>
+    layui.use(['layer', 'form'], function() {
+        var layer = layui.layer,
+            $ = layui.jquery,
+            form = layui.form;
+            $.get(`${__FORPUBLIC__}/admin/admin/personal`,function (res) {
+                    $('#name').val(res.data);
+            });
+            form.on('submit(admin)', function(data) {
+                $.ajax({
+                    url:`${__FORPUBLIC__}/admin/admin/personal`,
+                    data:$('#admin').serialize(),
+                    type:'post',
+                    async: false,
+                    success:function(res) {
+                        layer.msg(res.msg);
+                        if(res.code == 1) {
+                            $.get('admin_person.html',function (res) {
+                                    $('#admin_personal').html(res);
+                            })
+                        }
+                    }
+                })
+                return false;
+            });
+    });
+</script>

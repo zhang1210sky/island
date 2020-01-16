@@ -1,0 +1,256 @@
+<div id="publish_edit">
+
+    <div class="layui-tab" style="margin-top: 20px;">
+        <ul class="layui-tab-title">
+            <li><a href="javascript:;"  class="publish_edit_index">活动列表</a></li>
+            <li class="layui-this">修改活动详情</li>
+        </ul>
+    </div>
+    <form class="layui-form" id="form_activity_add" lay-filter="publish_edit">
+        <div class="layui-form-item">
+            <label class="layui-form-label">活动主题</label>
+            <div class="layui-input-block">
+                <input type="text" name="title" id="title" required  lay-verify="required" placeholder="请输入活动主题" autocomplete="off" class="a_title layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">活动地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="address" id="address" required  lay-verify="required" placeholder="请输入活动地址" autocomplete="off" class="a_title layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">活动电话</label>
+            <div class="layui-input-block">
+                <input type="text" name="phone" id="phone" required  lay-verify="required" placeholder="请输入电话" autocomplete="off" class="a_title layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">发布时间</label>
+                <div class="layui-input-inline">
+                    <input required  lay-verify="required"  type="text" id="publish_time" name="publish_time"  placeholder="请选择发布时间" autocomplete="off" class="layui-input a_time" value="">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">开始时间</label>
+                <div class="layui-input-inline">
+                    <input required  lay-verify="required"  type="text" id="start_time" name="start_time"  placeholder="请选择活动开始时间" autocomplete="off" class="layui-input a_time" value="">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">限制人数</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="p_number" id="p_number" required  lay-verify="required" placeholder="请输入限制人数" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">结束时间</label>
+                <div class="layui-input-inline">
+                    <input required  lay-verify="required"  type="text" id="end_time" name="end_time"  placeholder="请输入报名结束时间" autocomplete="off" class="layui-input a_time" value="">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <button type="button" class="layui-btn" id="publish">上传图片</button>
+            </label>
+            <div class="layui-input-inline">
+                <p>活动图片</p>
+                <img class="layui-upload-img"  id="demo1" style="width:150px;height: 150px;">
+                <p id="demoText"></p>
+            </div>
+        </div>
+        <div class="publishAppend">
+
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否置顶</label>
+            <div class="layui-input-block">
+                <input type="radio" name="is_hot" value="1" title="是">
+                <input type="radio" name="is_hot" value="0" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否隐藏</label>
+            <div class="layui-input-block">
+                <input type="radio" name="is_hide" value="1" title="是">
+                <input type="radio" name="is_hide" value="0" title="否" checked>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">活动内容</label>
+            <div class="layui-input-block">
+                <textarea name="content" id="content" placeholder="请输入活动内容" class="layui-textarea" style="width:100%;"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">活动备注</label>
+            <div class="layui-input-block">
+                <textarea name="remarks" id="remarks" placeholder="请输入备注" class="layui-textarea" style="width:100%;"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <a class="layui-btn" id="publish_edit_commit">立即提交</a>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $('.publish_edit_index').click(function () {
+        $.get("publish_index.html",function (res) {
+            $('#publish_edit').html(res);
+        })
+    })
+</script>
+<script>
+    var id = $('.pub_id').val();
+    $.get(`${__FORPUBLIC__}/admin/publish/edit`,{id:id},function (res) {
+        var form =layui.form;
+        form.val('publish_edit', {
+            "title": res.data.title
+            ,"address": res.data.address
+            ,"phone": res.data.phone
+            ,"publish_time": res.data.publish_time
+            ,"start_time": res.data.start_time
+            ,"content": res.data.content
+            ,"remarks": res.data.remarks
+            ,"is_hot": String(res.data.is_hot) //开关状态
+            ,"is_hide": String(res.data.is_hide)
+            ,'p_number': res.data.p_number
+            ,'end_time':res.data.end_time
+        });
+        $('#demo1').attr('src', "../"+res.data.pa_img);
+    });
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#publish'
+            ,url: `${__FORPUBLIC__}/admin/publish/img_edit?id=`+id
+            ,size: 1024*4 //限定大小
+            ,accept: 'images' //只允许上传图片
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#demo1').attr('src', result); //图片链接（base64）
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                layer.msg(res.msg);
+                // if(res.code > 0){
+                //     return layer.msg(res.msg);
+                // }
+                // //上传成功
+                // layer.msg('更新图片成功');
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+    });
+</script>
+<script>
+    layui.use(['layer', 'form'], function(){
+        var $ = layui.jquery
+            ,layer = layui.layer
+            ,from = layui.form;
+        from.render();
+        $('#publish_edit_commit').click(function () {
+            var title = $.trim($('#title').val());
+            var address = $('#address').val();
+            var phone = $('#phone').val();
+            var publish_time = $('#publish_time').val();
+            var start_time = $('#start_time').val();
+            var content = $('#content').val();
+            var remarks = $('#remarks').val();
+            var is_hot = $('input[name="is_hot"]:checked').val();
+            var is_hide = $('input[name="is_hide"]:checked').val();
+            var p_number = $('#p_number').val();
+            var end_time = $('#end_time').val();
+            if(isNaN(p_number) || p_number.length>4){
+                layer.msg("限制人数请为数字，且不能超过9999");
+                return;
+            }
+            if(title=="" || title.length>50){
+                layer.msg("主题不能为空或大于50个字");
+                return;
+            }
+            if(address=="" || address.length>50){
+                layer.msg("地址不能为空或大于50个字");
+                return;
+            }
+            if(publish_time=="" || start_time=="" || end_time==''){
+                layer.msg("请填写时间");
+                return;
+            }
+            if(isNaN(phone) || phone.length>20){
+                layer.msg("电话格式不对");
+                return;
+            }
+            var jsonData = {
+                'id' : id,
+                'title' : title,
+                'address' : address,
+                'is_hot' : is_hot,
+                'is_hide' : is_hide,
+                'phone' : phone,
+                'publish_time' : publish_time,
+                'start_time' : start_time,
+                'content' : content,
+                'remarks' : remarks,
+                'p_number' : p_number,
+                'end_time' : end_time
+            };
+            var jsonObj = JSON.stringify(jsonData);
+            $.ajax({
+                url:`${__FORPUBLIC__}/admin/publish/edit`,
+                type:'post',
+                contentType:"application/json;charset=utf-8,application/json",
+                data:jsonObj,
+                success:function (res) {
+                    layer.msg(res.msg);
+                    if(res.code==1){
+                        $.get("publish_index.html",function (data) {
+                            $('#publish_edit').html(data);
+                        })
+                    }
+                }
+            });
+            //get();
+        });
+    });
+</script>
+<script>
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        //常规用法
+        laydate.render({
+            elem: '#publish_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd HH:mm:ss'
+        });
+        laydate.render({
+            elem: '#start_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd HH:mm:ss'
+        })
+        laydate.render({
+            elem: '#end_time'
+            ,type: 'datetime'
+            ,format: 'yyyy-MM-dd HH:mm:ss'
+        })
+    });
+</script>
